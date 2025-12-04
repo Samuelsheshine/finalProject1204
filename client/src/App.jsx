@@ -15,7 +15,7 @@ const TRANSLATIONS = {
     loading: '資料載入中...',
     saving: '儲存中...',
     saved: '已儲存',
-    save_error: '儲存失敗',
+    save_error: '儲存失敗 (離線模式)',
     idle: '準備就緒',
     week: '週',
     mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六', sun: '週日',
@@ -121,7 +121,7 @@ const TRANSLATIONS = {
     record_saved: '已記錄「{subject}」。',
 
     // AI
-    ai_welcome: '嗨！我是 StudyHub 助理。我可以根據你的資料庫內容，回答關於課表、成績或行程的問題。\n\n你可以點擊下方的按鈕快速提問，或直接輸入文字。',
+    ai_welcome: '嗨！我是 StudyHub 助理。我會優先嘗試連線您的本地 AI 模型，若無法連線則使用基本查詢功能。',
     ai_thinking: '思考中...',
     ai_input_placeholder: '詢問關於您的課表、成績...',
     ai_preset_today_class: '今天有什麼課？',
@@ -129,9 +129,9 @@ const TRANSLATIONS = {
     ai_preset_report: '什麼時候有報告？',
     ai_preset_homework: '什麼時候有作業？',
     ai_preset_score: '我的成績如何？',
-    ai_preview_prefix: '(預覽模擬 - 僅回答資料庫內容)\n根據您的資料庫：\n',
-    ai_preview_suffix: '\n\n(以上為我所知的全部資訊)',
-    ai_reject: '(系統訊息)\n抱歉，我被設計為「StudyHub 專屬資料庫查詢員」。\n\n我無法回答關於「{input}」的通用知識問題。請詢問關於您的 **課表、成績、聯絡簿** 或 **今日行程** 的問題。',
+    ai_preview_prefix: '(離線模式 - 僅查詢資料庫)\n根據您的資料庫：\n',
+    ai_preview_suffix: '\n\n(若要使用完整 AI 功能，請確保後端伺服器與 LM Studio 已啟動)',
+    ai_reject: '(系統訊息)\n抱歉，離線模式下我只能回答關於您的 **課表、成績、聯絡簿** 或 **今日行程** 的問題。',
     today_highlight: '【今日 ({date}) 重點】',
     db_overview: '【資料庫全覽】',
     all_planner: '所有聯絡簿：',
@@ -157,7 +157,7 @@ const TRANSLATIONS = {
     loading: 'Loading...',
     saving: 'Saving...',
     saved: 'Saved',
-    save_error: 'Error',
+    save_error: 'Error (Offline)',
     idle: 'Ready',
     week: 'Week',
     mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
@@ -255,7 +255,7 @@ const TRANSLATIONS = {
     break_end: 'Break ended!',
     record_saved: 'Recorded "{subject}".',
 
-    ai_welcome: 'Hi! I am your StudyHub Assistant. I can answer questions about your schedule, grades, or planner based on your database.\n\nClick a button below or type to ask.',
+    ai_welcome: 'Hi! I will try to connect to your local AI model first, otherwise I will use basic query functions.',
     ai_thinking: 'Thinking...',
     ai_input_placeholder: 'Ask about schedule, grades...',
     ai_preset_today_class: 'Classes today?',
@@ -263,9 +263,9 @@ const TRANSLATIONS = {
     ai_preset_report: 'When is the report due?',
     ai_preset_homework: 'Any homework?',
     ai_preset_score: 'How are my grades?',
-    ai_preview_prefix: '(Preview - DB Context Only)\nBased on your data:\n',
-    ai_preview_suffix: '\n\n(End of known info)',
-    ai_reject: '(System)\nI am designed as a "StudyHub DB Query Agent".\n\nI cannot answer general questions like "{input}". Please ask about your **Timetable, Grades, Planner** or **Today\'s Schedule**.',
+    ai_preview_prefix: '(Offline - DB Query Only)\nBased on your data:\n',
+    ai_preview_suffix: '\n\n(For full AI features, ensure backend & LM Studio are running)',
+    ai_reject: '(System)\nOffline mode: I can only answer questions about your **Timetable, Grades, Planner** or **Today\'s Schedule**.',
     today_highlight: '【Today ({date}) Highlights】',
     db_overview: '【Database Overview】',
     all_planner: 'All Planner Items:',
@@ -290,7 +290,7 @@ const TRANSLATIONS = {
     loading: '読み込み中...',
     saving: '保存中...',
     saved: '保存完了',
-    save_error: '保存失敗',
+    save_error: '保存失敗 (オフライン)',
     idle: '準備完了',
     week: '週',
     mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日',
@@ -388,7 +388,7 @@ const TRANSLATIONS = {
     break_end: '休憩終了！',
     record_saved: '「{subject}」を記録しました。',
 
-    ai_welcome: 'こんにちは！StudyHub アシスタントです。あなたのデータベースに基づいて、時間割、成績、予定に関する質問にお答えします。\n\n下のボタンをクリックするか、文字を入力してください。',
+    ai_welcome: 'こんにちは！ローカルAIへの接続を試みます。接続できない場合は基本機能を使用します。',
     ai_thinking: '考え中...',
     ai_input_placeholder: '時間割や成績について聞く...',
     ai_preset_today_class: '今日の授業は？',
@@ -396,9 +396,9 @@ const TRANSLATIONS = {
     ai_preset_report: 'レポートの締切は？',
     ai_preset_homework: '宿題はある？',
     ai_preset_score: '成績はどう？',
-    ai_preview_prefix: '(プレビュー - DB内容のみ)\nデータに基づいて：\n',
-    ai_preview_suffix: '\n\n(以上が私が知っている情報です)',
-    ai_reject: '(システム)\n申し訳ありませんが、私は「StudyHub 専用 DB 検索エージェント」です。\n\n「{input}」のような一般的な質問にはお答えできません。**時間割、成績、連絡帳** または **今日の予定** について質問してください。',
+    ai_preview_prefix: '(オフライン - DB検索のみ)\nデータに基づいて：\n',
+    ai_preview_suffix: '\n\n(完全な機能にはバックエンド接続が必要です)',
+    ai_reject: '(システム)\nオフラインモード: **時間割、成績、連絡帳** または **今日の予定** についてのみ回答できます。',
     today_highlight: '【今日 ({date}) のハイライト】',
     db_overview: '【データベース概要】',
     all_planner: '全ての予定：',
@@ -515,10 +515,39 @@ export default function StudyHubApp() {
   // 新增：歷史學期存檔
   const [archivedSemesters, setArchivedSemesters] = useState([]);
 
-  // --- 資料庫整合邏輯 ---
+  // --- 資料庫整合邏輯 (Hybrid: API first, LocalStorage fallback) ---
 
   useEffect(() => {
     const fetchData = async () => {
+      try {
+        // 1. 嘗試從後端讀取
+        const res = await fetch('/api/data');
+        if (res.ok) {
+          const data = await res.json();
+          if (Object.keys(data).length > 0) {
+            if (data.tasks) setTasks(data.tasks);
+            if (data.grades) setGrades(data.grades);
+            if (data.timetable) setTimetable(data.timetable);
+            if (data.periodTimes) setPeriodTimes(data.periodTimes);
+            if (data.gpaCourses) setGpaCourses(data.gpaCourses);
+            if (data.links) setLinks(data.links);
+            if (data.studyLogs) setStudyLogs(data.studyLogs);
+            if (data.pomodoroSubjects) setPomodoroSubjects(data.pomodoroSubjects);
+            if (data.currentDate) setCurrentDate(new Date(data.currentDate));
+            if (data.semesterStart) setSemesterStart(new Date(data.semesterStart));
+            if (data.semesterWeeks) setSemesterWeeks(data.semesterWeeks);
+            if (data.courseCriteria) setCourseCriteria(data.courseCriteria);
+            if (data.language) setLanguage(data.language); 
+            if (data.archivedSemesters) setArchivedSemesters(data.archivedSemesters);
+            setIsDataLoaded(true);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log("Backend not connected, loading from localStorage");
+      }
+
+      // 2. 後端失敗或無資料，讀取 LocalStorage
       try {
         const savedData = localStorage.getItem('studyhub_data');
         if (savedData) {
@@ -541,7 +570,7 @@ export default function StudyHubApp() {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        console.error("Failed to fetch data from localStorage:", error);
       } finally {
         setIsDataLoaded(true);
       }
@@ -584,8 +613,7 @@ export default function StudyHubApp() {
     setSaveStatus('saving');
 
     saveTimeoutRef.current = setTimeout(async () => {
-      try {
-        const payload = {
+      const payload = {
           tasks, grades, timetable, periodTimes, gpaCourses, links, studyLogs, pomodoroSubjects,
           currentDate: currentDate.toISOString(),
           semesterStart: semesterStart.toISOString(),
@@ -593,16 +621,36 @@ export default function StudyHubApp() {
           courseCriteria,
           language,
           archivedSemesters
-        };
+      };
+
+      try {
+        // 1. 嘗試儲存到後端
+        const res = await fetch('/api/data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
         
+        if (res.ok) {
+            setSaveStatus('saved');
+            // 同時更新 localStorage 作為備份
+            localStorage.setItem('studyhub_data', JSON.stringify(payload));
+            return;
+        }
+      } catch (e) {
+        console.warn("Backend save failed, using localStorage");
+      }
+
+      // 2. 後端失敗，儲存到 LocalStorage
+      try {
         localStorage.setItem('studyhub_data', JSON.stringify(payload));
         await new Promise(r => setTimeout(r, 300));
-        setSaveStatus('saved');
+        setSaveStatus('saved'); // 或顯示 'offline'
       } catch (e) {
         console.error("Save error:", e);
         setSaveStatus('error');
       }
-    }, 1000);
+    }, 1500); // 增加延遲避免頻繁請求
 
     return () => clearTimeout(saveTimeoutRef.current);
   }, [tasks, grades, timetable, periodTimes, gpaCourses, links, studyLogs, pomodoroSubjects, currentDate, semesterStart, semesterWeeks, courseCriteria, language, archivedSemesters, isDataLoaded]);
@@ -750,7 +798,8 @@ export default function StudyHubApp() {
                 <ChevronLeft size={16} />
                 </button>
                 
-                <div className="flex flex-col items-center px-3 min-w-[120px] relative group">
+                {/* 日期選擇器區域 */}
+                <div className="flex flex-col items-center px-3 min-w-[120px] relative group cursor-pointer hover:bg-gray-200/50 rounded transition-colors" title="點擊選擇日期">
                     <input 
                         type="date" 
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -762,7 +811,15 @@ export default function StudyHubApp() {
                                 setCurrentDate(newDate);
                             }
                         }}
-                        title="點擊選擇日期"
+                        onClick={(e) => {
+                            try {
+                                if (typeof e.target.showPicker === 'function') {
+                                    e.target.showPicker();
+                                }
+                            } catch (error) {
+                                console.log('Browser does not support showPicker', error);
+                            }
+                        }}
                     />
                     <span className="text-xs font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
                         {weekDays[0].getMonth()+1}/{weekDays[0].getDate()} - {weekDays[6].getMonth()+1}/{weekDays[6].getDate()}
@@ -1026,7 +1083,29 @@ export default function StudyHubApp() {
         setMessages(newMessages); 
         if (typeof text !== 'string') setInput(''); 
         setIsSending(true);
+
+        // 1. 嘗試呼叫後端 API
+        try {
+            const context = getSystemContext();
+            const apiMessages = [{ role: 'system', content: context }, ...newMessages];
+            
+            const response = await fetch('/api/chat', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ messages: apiMessages }) 
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+                setIsSending(false);
+                return; // 成功後直接返回
+            }
+        } catch (error) {
+            console.log("Backend API not available, switching to local mode.");
+        }
         
+        // 2. 如果後端失敗，使用前端模擬回應 (Fallback)
         setTimeout(() => {
             const dbKeywords = /課|行程|表|time|schedule|today|今天|成績|grade|score|gpa|聯絡簿|作業|考試|report|homework|exam/i;
             const isAskingAboutDB = dbKeywords.test(userMsg.content);
@@ -1120,6 +1199,14 @@ export default function StudyHubApp() {
           setEditModal({ ...editModal, isOpen: false });
       };
 
+      const deleteSubject = () => {
+          const { key } = editModal;
+          const newTimetable = { ...timetable };
+          delete newTimetable[key];
+          setTimetable(newTimetable);
+          setEditModal({ ...editModal, isOpen: false });
+      };
+
       return (
           <div className="h-full flex flex-col">
               <div className="flex-1 overflow-auto rounded-xl border border-gray-200 shadow-sm bg-white">
@@ -1182,6 +1269,12 @@ export default function StudyHubApp() {
                               <input autoFocus className="w-full border border-gray-300 rounded-xl p-3 mb-5 text-sm focus:border-black outline-none" value={editModal.value} onChange={e => setEditModal({...editModal, value: e.target.value})} placeholder={t('course_name_placeholder')} />
                           )}
                           <div className="flex gap-3">
+                              {/* 只有在編輯課程且該格子已經有課程時，才顯示刪除按鈕 */}
+                              {editModal.type === 'subject' && timetable[editModal.key] && (
+                                <button onClick={deleteSubject} className="flex-1 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-1">
+                                    <Trash2 size={16} /> {t('delete')}
+                                </button>
+                              )}
                               <button onClick={() => setEditModal({...editModal, isOpen: false})} className="flex-1 py-2.5 bg-gray-100 rounded-xl text-sm font-bold text-gray-600">{t('cancel')}</button>
                               <button onClick={saveEdit} className="flex-1 py-2.5 bg-black text-white rounded-xl text-sm font-bold">{t('confirm')}</button>
                           </div>
@@ -2076,7 +2169,13 @@ export default function StudyHubApp() {
     
     const handleAdd = (dateStr) => { 
         if (!newItem.subject) return; 
-        setTasks([...tasks, { id: Date.now(), date: dateStr, ...newItem, completed: false }]); 
+        
+        // 取得當前語言的類別名稱 (例如: "考試" 或 "Exam")
+        const categoryName = t('categories.' + newItem.category);
+        // 將類別名稱加到備註的最前面，中間加一個空格
+        const finalNote = newItem.note ? `${categoryName} ${newItem.note}` : categoryName;
+
+        setTasks([...tasks, { id: Date.now(), date: dateStr, ...newItem, note: finalNote, completed: false }]); 
         setNewItem({ ...newItem, subject: '', note: '' }); 
     };
 
@@ -2106,15 +2205,28 @@ export default function StudyHubApp() {
                         {dayTasks.length === 0 && <div className="text-[10px] text-gray-300 text-center py-4 italic">{t('no_tasks')}</div>}
                         {dayTasks.map(task => (
                             <div key={task.id} className={`group relative bg-white p-2 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all ${task.completed ? 'opacity-60 grayscale' : ''}`}>
-                                <div className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full ${CATEGORIES[task.category.toUpperCase()].color}`}></div>
-                                <div className="flex items-start gap-2 pl-1.5">
-                                    <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} className="mt-0.5 w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"/>
+                                <div className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${CATEGORIES[task.category.toUpperCase()].color}`}></div>
+                                <div className="flex items-start gap-2 pl-2">
+                                    <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} className="mt-0.5 w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"/>
                                     <div className="flex-1 min-w-0">
                                         <div className={`font-bold text-xs truncate ${task.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.subject}</div>
-                                        <div className="text-[10px] text-gray-500 truncate">{task.note}</div>
+                                        <div className="text-[10px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                                            <span className={`px-1.5 py-0.5 rounded text-white font-bold text-[9px] ${CATEGORIES[task.category.toUpperCase()]?.color}`}>
+                                                {t('categories.' + task.category)}
+                                            </span>
+                                            <span className={task.completed ? 'line-through' : ''}>{task.note}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <button onClick={() => handleDelete(task.id, task.subject)} className="absolute top-1 right-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={12} /></button>
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(task.id, task.subject);
+                                    }}
+                                    className="absolute top-1 right-1 text-gray-300 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
                             </div>
                         ))}
                     </div>
