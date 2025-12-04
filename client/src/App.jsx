@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Check, Edit2, RotateCw, X, BookOpen, ArrowLeft, Sparkles, Clock, Calendar, Calculator, Trash2, Send, Link as LinkIcon, ExternalLink, BarChart2, Cloud, Settings, PieChart, Globe, Save, AlertCircle, History, Archive, Moon, Sun, Upload, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Check, Edit2, RotateCw, X, BookOpen, ArrowLeft, Sparkles, Clock, Calendar, Calculator, Trash2, Send, Link as LinkIcon, ExternalLink, BarChart2, Cloud, Settings, PieChart, Globe, Save, AlertCircle, History, Archive, Moon, Sun, Upload, Download, Key, Bot } from 'lucide-react';
 
 // --- 多語言翻譯字典 ---
 const TRANSLATIONS = {
@@ -81,6 +81,8 @@ const TRANSLATIONS = {
     edit_modal_title_course: '編輯課程',
     course_name_placeholder: '輸入課程名稱...',
     setting_hint: '設定',
+    clear_timetable: '清空課表',
+    confirm_clear_timetable: '確定要清空所有課表嗎？此動作無法復原。',
 
     // 成績 & GPA
     all_records: '本週紀錄',
@@ -132,7 +134,7 @@ const TRANSLATIONS = {
     record_saved: '已記錄「{subject}」。',
 
     // AI
-    ai_welcome: '嗨！我是 StudyHub 助理。目前為純前端模式，我僅能進行簡單的資料查詢。',
+    ai_welcome: '嗨！我是 StudyHub 助理。請先設定 API Key，並選擇適合的模型 (若遇到錯誤，請嘗試切換模型)。',
     ai_thinking: '思考中...',
     ai_input_placeholder: '詢問關於您的課表、成績...',
     ai_preset_today_class: '今天有什麼課？',
@@ -140,9 +142,12 @@ const TRANSLATIONS = {
     ai_preset_report: '什麼時候有報告？',
     ai_preset_homework: '什麼時候有作業？',
     ai_preset_score: '我的成績如何？',
-    ai_preview_prefix: '(離線模式 - 僅查詢資料庫)\n根據您的資料庫：\n',
-    ai_preview_suffix: '\n\n(提示：您可以使用「匯出備份」功能來保存您的資料)',
-    ai_reject: '(系統訊息)\n離線模式下我只能回答關於您的 **課表、成績、聯絡簿** 或 **今日行程** 的問題。',
+    ai_key_placeholder: '輸入 Google AI Studio API Key',
+    ai_key_save: '儲存 Key',
+    ai_key_missing: '請先輸入 API Key 才能使用 AI 功能',
+    ai_error: 'API 錯誤',
+    ai_model_select: '模型:',
+    
     today_highlight: '【今日 ({date}) 重點】',
     db_overview: '【資料庫全覽】',
     all_planner: '所有聯絡簿：',
@@ -230,6 +235,8 @@ const TRANSLATIONS = {
     edit_modal_title_course: 'Edit Course',
     course_name_placeholder: 'Course Name...',
     setting_hint: 'Set',
+    clear_timetable: 'Clear All',
+    confirm_clear_timetable: 'Are you sure you want to clear the entire timetable? This cannot be undone.',
 
     all_records: 'Weekly Log',
     subject_categories: 'By Subject',
@@ -277,7 +284,7 @@ const TRANSLATIONS = {
     break_end: 'Break ended!',
     record_saved: 'Recorded "{subject}".',
 
-    ai_welcome: 'Hi! I am StudyHub Assistant (Offline Mode). I can help you query your local data.',
+    ai_welcome: 'Hi! I am StudyHub Assistant. Please set your API Key first. If you encounter errors, try switching models.',
     ai_thinking: 'Thinking...',
     ai_input_placeholder: 'Ask about schedule, grades...',
     ai_preset_today_class: 'Classes today?',
@@ -285,9 +292,12 @@ const TRANSLATIONS = {
     ai_preset_report: 'When is the report due?',
     ai_preset_homework: 'Any homework?',
     ai_preset_score: 'How are my grades?',
-    ai_preview_prefix: '(Offline Mode)\nBased on your data:\n',
-    ai_preview_suffix: '\n\n(Tip: You can use "Export Backup" to save your data)',
-    ai_reject: '(System)\nOffline mode: I can only answer questions about your **Timetable, Grades, Planner** or **Today\'s Schedule**.',
+    ai_key_placeholder: 'Enter Google AI Studio API Key',
+    ai_key_save: 'Save Key',
+    ai_key_missing: 'Please enter API Key to use AI features',
+    ai_error: 'API Error',
+    ai_model_select: 'Model:',
+    
     today_highlight: '【Today ({date}) Highlights】',
     db_overview: '【Database Overview】',
     all_planner: 'All Planner Items:',
@@ -374,6 +384,8 @@ const TRANSLATIONS = {
     edit_modal_title_course: '科目編集',
     course_name_placeholder: '科目名を入力...',
     setting_hint: '設定',
+    clear_timetable: '時間割をクリア',
+    confirm_clear_timetable: 'すべての時間割を削除しますか？この操作は取り消せません。',
 
     all_records: '今週の記録',
     subject_categories: '科目別',
@@ -382,7 +394,7 @@ const TRANSLATIONS = {
     add_course: '科目追加',
     course_name: '科目名',
     credit: '単位',
-    score: '学期成績',
+    score: '學期成績',
     gpa_score: 'GPA',
     action: '詳細項目',
     grade_note_placeholder: 'メモ (例: 中間テスト)',
@@ -421,7 +433,7 @@ const TRANSLATIONS = {
     break_end: '休憩終了！',
     record_saved: '「{subject}」を記録しました。',
 
-    ai_welcome: 'こんにちは！StudyHub アシスタントです（オフラインモード）。ローカルデータの検索をお手伝いします。',
+    ai_welcome: 'こんにちは！StudyHub アシスタントです。まずAPIキーを設定してください。エラーが発生した場合は、モデルを切り替えてみてください。',
     ai_thinking: '考え中...',
     ai_input_placeholder: '時間割や成績について聞く...',
     ai_preset_today_class: '今日の授業は？',
@@ -429,9 +441,12 @@ const TRANSLATIONS = {
     ai_preset_report: 'レポートの締切は？',
     ai_preset_homework: '宿題はある？',
     ai_preset_score: '成績はどう？',
-    ai_preview_prefix: '(オフラインモード)\nデータに基づいて：\n',
-    ai_preview_suffix: '\n\n(ヒント: 「バックアップをエクスポート」でデータを保存できます)',
-    ai_reject: '(システム)\nオフラインモード: **時間割、成績、連絡帳** または **今日の予定** についてのみ回答できます。',
+    ai_key_placeholder: 'Google AI Studio API Keyを入力',
+    ai_key_save: 'キーを保存',
+    ai_key_missing: 'AI機能を使用するにはAPIキーを入力してください',
+    ai_error: 'API エラー',
+    ai_model_select: 'モデル:',
+    
     today_highlight: '【今日 ({date}) のハイライト】',
     db_overview: '【データベース概要】',
     all_planner: '全ての予定：',
@@ -504,6 +519,13 @@ export default function StudyHubApp() {
   const [activeTab, setActiveTab] = useState('timetable'); 
   const [currentDate, setCurrentDate] = useState(new Date()); 
   const [language, setLanguage] = useState('zh-TW'); 
+  const [apiKey, setApiKey] = useState(() => {
+      try {
+          return localStorage.getItem('google_ai_key') || '';
+      } catch (e) {
+          return '';
+      }
+  });
   
   // 初始化主題 (安全地讀取 localStorage)
   const [theme, setTheme] = useState(() => {
@@ -532,6 +554,12 @@ export default function StudyHubApp() {
       // 忽略錯誤 (例如無痕模式)
     }
   }, [theme]);
+
+  // 儲存 API Key
+  const handleSaveApiKey = (key) => {
+      setApiKey(key);
+      localStorage.setItem('google_ai_key', key);
+  };
 
   const t = (key, params = {}) => {
     let text = TRANSLATIONS[language][key] || key;
@@ -1084,20 +1112,6 @@ export default function StudyHubApp() {
 
   // --- Views (LinksView, AIChatView, TimetableView, PomodoroView, GpaView, GradesView, DashboardView, PlannerView 保持不變) ---
   
-  // (以下省略 Views 程式碼以節省空間，請保持原樣)
-  // ... (LinksView code)
-  // ... (AIChatView code)
-  // ... (TimetableView code)
-  // ... (PomodoroView code)
-  // ... (GpaView code)
-  // ... (GradesView code)
-  // ... (DashboardView code)
-  // ... (PlannerView code)
-
-  // 這裡為了完整性，將之前的 LinksView 等元件全部放回來 (因為是單一檔案)
-  // ... 
-  
-  // (為確保程式碼完整，以下重複貼上先前的 View 元件)
   const LinksView = ({ links, setLinks }) => {
       const [isAdding, setIsAdding] = useState(false);
       const [newLink, setNewLink] = useState({ title: '', url: '' });
@@ -1174,8 +1188,18 @@ export default function StudyHubApp() {
       );
   };
 
-  const AIChatView = ({ tasks, grades, timetable, currentDate, gpaCourses, periodTimes }) => {
+  const AIChatView = ({ tasks, grades, timetable, currentDate, gpaCourses, periodTimes, apiKey, handleSaveApiKey }) => {
     const [messages, setMessages] = useState([]);
+    const [tempKey, setTempKey] = useState(apiKey || '');
+    const [aiModel, setAiModel] = useState(() => {
+        return localStorage.getItem('google_ai_model') || 'gemini-1.5-flash';
+    });
+
+    const handleModelChange = (e) => {
+        const newModel = e.target.value;
+        setAiModel(newModel);
+        localStorage.setItem('google_ai_model', newModel);
+    };
     
     useEffect(() => {
         setMessages([{ role: 'assistant', content: t('ai_welcome') }]);
@@ -1201,42 +1225,92 @@ export default function StudyHubApp() {
             .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
             .join('\n');
 
-        const todaysTasks = tasks.filter(t => t.date === getLocalDateString(currentDate))
-            .map(t => `[${t('categories.' + t.category) || t('categories.other')}] ${t.subject}: ${t.note}`)
+        const todaysTasks = tasks.filter(task => task.date === getLocalDateString(currentDate))
+            .map(task => `[${t('categories.' + task.category) || t('categories.other')}] ${task.subject}: ${task.note}`)
             .join('\n');
 
-        const allTasks = tasks.map(t => `(${t.date}) [${t('categories.' + t.category) || t('categories.other')}] ${t.subject}: ${t.note}`).join('\n');
+        const allTasks = tasks.map(task => `(${task.date}) [${t('categories.' + task.category) || t('categories.other')}] ${task.subject}: ${task.note}`).join('\n');
         const allGrades = grades.map(g => `[${g.subject}] ${g.score} (${g.note})`).join('\n');
 
-        return `${t('today_highlight', {date: getLocalDateString(currentDate)})}\n${todaysClasses || t('no_class')}\n\n${t('no_tasks_today') || t('no_todo')}\n${todaysTasks || t('no_tasks')}\n\n${t('db_overview')}\n${t('all_planner')}\n${allTasks}\n\n${t('all_grades')}\n${allGrades}`;
+        return `System Prompt: You are a helpful student assistant. Answer questions based on the student's data provided below.
+        
+Current Date: ${getLocalDateString(currentDate)}
+
+Today's Schedule:
+${todaysClasses || 'No classes'}
+
+Today's Tasks:
+${todaysTasks || 'No tasks'}
+
+All Tasks:
+${allTasks}
+
+All Grades:
+${allGrades}
+
+Please answer in the language: ${language === 'en' ? 'English' : (language === 'ja' ? 'Japanese' : 'Traditional Chinese')}.
+Keep your response concise and helpful.`;
     };
 
     const handleSend = async (text = null) => {
         const content = typeof text === 'string' ? text : input;
         if (!content.trim() || isSending) return;
         
+        if (!apiKey) {
+            setMessages(prev => [...prev, { role: 'user', content: content }, { role: 'assistant', content: t('ai_key_missing') }]);
+            setInput('');
+            return;
+        }
+
         const userMsg = { role: 'user', content: content };
         const newMessages = [...messages, userMsg];
         setMessages(newMessages); 
         if (typeof text !== 'string') setInput(''); 
         setIsSending(true);
 
-        // 純前端模式：直接模擬回應
-        setTimeout(() => {
-            const dbKeywords = /課|行程|表|time|schedule|today|今天|成績|grade|score|gpa|聯絡簿|作業|考試|report|homework|exam/i;
-            const isAskingAboutDB = dbKeywords.test(userMsg.content);
+        try {
+            const systemContext = getSystemContext();
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${aiModel}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [{ text: systemContext + "\n\nUser Question: " + content }]
+                        }
+                    ]
+                })
+            });
 
-            let fakeReply = "";
-            if (isAskingAboutDB) {
-                 const context = getSystemContext();
-                 fakeReply = `${t('ai_preview_prefix')}${context}${t('ai_preview_suffix')}`;
-            } else {
-                 fakeReply = t('ai_reject', {input: userMsg.content});
+            // 嘗試解析 JSON，無論狀態碼為何
+            const data = await response.json();
+
+            if (!response.ok) {
+                // 如果 API 回傳錯誤狀態，拋出詳細錯誤訊息
+                const errorMsg = data.error?.message || `API Error: ${response.status} ${response.statusText}`;
+                throw new Error(errorMsg);
             }
-            
-            setMessages(prev => [...prev, { role: 'assistant', content: fakeReply }]);
+
+            // 檢查是否因為安全性篩選而沒有候選回應
+            if (!data.candidates || data.candidates.length === 0) {
+                 if (data.promptFeedback && data.promptFeedback.blockReason) {
+                     throw new Error(`AI 無法回應此問題 (原因: ${data.promptFeedback.blockReason})`);
+                 }
+                 throw new Error("AI 沒有回傳任何內容，請稍後再試。");
+            }
+
+            const reply = data.candidates[0].content.parts[0].text;
+            setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+
+        } catch (error) {
+            console.error("AI Error:", error);
+            setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${t('ai_error')}: ${error.message}` }]);
+        } finally {
             setIsSending(false);
-        }, 800);
+        }
     };
 
     const presetQuestions = [
@@ -1249,6 +1323,52 @@ export default function StudyHubApp() {
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            {/* API Key 設定區 */}
+            {!apiKey ? (
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <Key className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                            <input 
+                                type="password" 
+                                placeholder={t('ai_key_placeholder')}
+                                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                value={tempKey}
+                                onChange={(e) => setTempKey(e.target.value)}
+                            />
+                        </div>
+                        <button 
+                            onClick={() => handleSaveApiKey(tempKey)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                        >
+                            {t('ai_key_save')}
+                        </button>
+                    </div>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+                            Get API Key from Google AI Studio
+                        </a>
+                    </p>
+                </div>
+            ) : (
+                <div className="p-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center px-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Bot size={14} />
+                        <span className="font-bold">{t('ai_model_select')}</span>
+                        <select 
+                            value={aiModel} 
+                            onChange={handleModelChange}
+                            className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-xs outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 cursor-pointer"
+                        >
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (推薦)</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                            <option value="gemini-pro">Gemini 1.0 Pro</option>
+                        </select>
+                    </div>
+                    <button onClick={() => { setApiKey(''); localStorage.removeItem('google_ai_key'); }} className="text-xs text-red-400 hover:text-red-600 underline">重設 Key</button>
+                </div>
+            )}
+
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {messages.map((msg, idx) => ( <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[70%] rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${msg.role === 'user' ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 rounded-br-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-600 rounded-bl-none'}`}>{msg.content}</div></div> ))}
                 {isSending && <div className="text-gray-400 text-xs ml-4 animate-pulse">{t('ai_thinking')}</div>}
@@ -1323,6 +1443,12 @@ export default function StudyHubApp() {
           setEditModal({ ...editModal, isOpen: false });
       };
 
+      const handleClearTimetable = () => {
+          if (window.confirm(t('confirm_clear_timetable'))) {
+              setTimetable({});
+          }
+      };
+
       return (
           <div className="h-full flex flex-col">
               <div className="flex-1 overflow-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
@@ -1365,7 +1491,16 @@ export default function StudyHubApp() {
                 </div>
               </div>
               
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end gap-3">
+                  {isEditing && (
+                    <button 
+                        onClick={handleClearTimetable} 
+                        className="px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50"
+                    >
+                        <Trash2 size={16} /> {t('clear_timetable')}
+                    </button>
+                  )}
+                  
                   <button onClick={() => setIsEditing(!isEditing)} className={`px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 ${isEditing ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
                       {isEditing ? <> <Check size={16} /> {t('finish_edit')} </> : <> <Edit2 size={16} /> {t('edit_timetable')} </>}
                   </button>
@@ -2240,11 +2375,11 @@ export default function StudyHubApp() {
                       const day = i + 1;
                       const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
                       const isSelected = day === currentDate.getDate();
-                      const dayTasks = tasks.filter(t => new Date(t.date).toDateString() === dateObj.toDateString());
+                      const dayTasks = tasks.filter(task => new Date(task.date).toDateString() === dateObj.toDateString());
                       return (
                           <div key={i} onClick={() => setCurrentDate(dateObj)} className={`aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer relative transition-all ${isSelected ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 shadow-md' : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
                               <span className="text-xs font-bold z-10">{day}</span>
-                              <div className="flex gap-0.5 mt-1 h-1">{dayTasks.slice(0, 3).map((t, idx) => (<div key={idx} className={`w-1 h-1 rounded-full ${CATEGORIES[t.category.toUpperCase()]?.color || 'bg-gray-400'}`}></div>))}</div>
+                              <div className="flex gap-0.5 mt-1 h-1">{dayTasks.slice(0, 3).map((task, idx) => (<div key={idx} className={`w-1 h-1 rounded-full ${CATEGORIES[task.category.toUpperCase()]?.color || 'bg-gray-400'}`}></div>))}</div>
                           </div>
                       );
                   })}
@@ -2254,13 +2389,13 @@ export default function StudyHubApp() {
           <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col">
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">{currentDate.getMonth()+1}/{currentDate.getDate()} 行程概覽</h3>
               <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                {tasks.filter(t => new Date(t.date).toDateString() === currentDate.toDateString()).length === 0 ? (
+                {tasks.filter(task => new Date(task.date).toDateString() === currentDate.toDateString()).length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-500 text-sm italic">
                         <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3"><Sparkles size={24} className="opacity-20"/></div>
                         {t('no_tasks_today')}
                     </div>
                 ) : (
-                    tasks.filter(t => new Date(t.date).toDateString() === currentDate.toDateString()).map(task => (
+                    tasks.filter(task => new Date(task.date).toDateString() === currentDate.toDateString()).map(task => (
                         <div key={task.id} className={`flex items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${CATEGORIES[task.category.toUpperCase()].border} border-t border-r border-b border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow`}>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -2282,7 +2417,7 @@ export default function StudyHubApp() {
     const [newItem, setNewItem] = useState({ category: 'homework', subject: '', note: '' });
     const fileInputRef = useRef(null);
     
-    const toggleTask = (id) => { setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t)); };
+    const toggleTask = (id) => { setTasks(tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task)); };
     
     const handleAdd = (dateStr) => { 
         if (!newItem.subject) return; 
@@ -2298,7 +2433,7 @@ export default function StudyHubApp() {
 
     const handleDelete = (taskId, taskSubject) => {
         if (window.confirm(t('confirm_delete_task', {subject: taskSubject}))) {
-            setTasks(tasks.filter(t => t.id !== taskId));
+            setTasks(tasks.filter(task => task.id !== taskId));
         }
     };
 
@@ -2391,7 +2526,7 @@ export default function StudyHubApp() {
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 h-full overflow-y-auto xl:overflow-hidden">
             {weekDays.map((day, index) => {
             const dateStr = getLocalDateString(day);
-            const dayTasks = tasks.filter(t => t.date === dateStr);
+            const dayTasks = tasks.filter(task => task.date === dateStr);
             const isToday = new Date().toDateString() === day.toDateString();
             const weekDayKey = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][index];
             
@@ -2472,7 +2607,7 @@ export default function StudyHubApp() {
                   {activeTab === 'gpa' && <GpaView gpaCourses={gpaCourses} setGpaCourses={setGpaCourses} courseCriteria={courseCriteria} setCourseCriteria={setCourseCriteria} />}
                   {activeTab === 'timetable' && <TimetableView timetable={timetable} setTimetable={setTimetable} periodTimes={periodTimes} setPeriodTimes={setPeriodTimes} />}
                   {activeTab === 'pomodoro' && <PomodoroView studyLogs={studyLogs} setStudyLogs={setStudyLogs} currentDate={currentDate} pomodoroSubjects={pomodoroSubjects} setPomodoroSubjects={setPomodoroSubjects} />}
-                  {activeTab === 'ai' && <AIChatView tasks={tasks} grades={grades} timetable={timetable} currentDate={currentDate} gpaCourses={gpaCourses} periodTimes={periodTimes} />}
+                  {activeTab === 'ai' && <AIChatView tasks={tasks} grades={grades} timetable={timetable} currentDate={currentDate} gpaCourses={gpaCourses} periodTimes={periodTimes} apiKey={apiKey} handleSaveApiKey={handleSaveApiKey} />}
                   {activeTab === 'links' && <LinksView links={links} setLinks={setLinks} />}
                 </>
              )}

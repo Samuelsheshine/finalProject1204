@@ -1,0 +1,44 @@
+{
+  "tasks": [
+    {"category": "exam", "completed": false, "date": "2025-11-30", "id": 1, "note": "Ch1-3", "subject": "範例:微積分"},
+    {"category": "homework", "completed": true, "date": "2025-11-24", "id": 1764559969991, "note": "ch5-8", "subject": "數學"},
+    {"category": "report", "completed": true, "date": "2025-11-24", "id": 1764560180541, "note": "期末報告", "subject": "專題"},
+    {"category": "homework", "completed": true, "date": "2025-11-24", "id": 1764560198370, "note": "ˋ55", "subject": "債"},
+    {"category": "homework", "completed": true, "date": "2025-11-24", "id": 1764560348242, "note": "5", "subject": "5"},
+    {"category": "homework", "completed": true, "date": "2025-12-01", "id": 1764560372517, "note": "3", "subject": "3"},
+    {"category": "homework", "completed": false, "date": "2025-11-24", "id": 1764562977417, "note": "", "subject": "ˋ"},
+    {"category": "homework", "completed": false, "date": "2025-11-24", "id": 1764562987405, "note": "", "subject": "應"},
+    {"category": "homework", "completed": false, "date": "2025-12-09", "id": 1764562999959, "note": "", "subject": "應"},
+    {"category": "homework", "completed": false, "date": "2025-12-13", "id": 1764563008069, "note": "", "subject": "應"},
+    {"category": "homework", "completed": false, "date": "2025-12-06", "id": 1764563034436, "note": "", "subject": "應"}
+  ],
+  "grades": [
+    {"date": "2025-12-01", "id": 1764560008012, "note": "小考", "score": "100", "subject": "數學"},
+    {"date": "2025-11-30", "id": 1, "note": "期中考", "score": "85", "subject": "範例:計算機概論"}
+  ],
+  "timetable": {
+    "1-1": "微積分",
+    "1-2": "微積分",
+    "1-3": "工程數學"
+  },
+  "periodTimes": {
+    "1": "08:10-09:00",
+    "2": "09:10-10:00",
+    "3": "10:10-11:00",
+    "4": "11:10-12:00",
+    "5": "13:20-14:10",
+    "6": "14:20-15:10",
+    "7": "15:20-16:10",
+    "8": "16:20-17:10"
+  },
+  "gpaCourses": [
+    {"credit": "3", "id": 1764560072664, "name": "雲端服務應用導論", "note": "", "score": "98"}
+  ],
+  "links": [
+    {"id": 1764516972926, "title": "台科大moodle", "url": "https://moodle2.ntust.edu.tw/"}
+  ],
+  "studyLogs": [],
+  "pomodoroSubjects": ["數學"],
+  "currentDate": "2025-11-30T16:00:00.000Z",
+  "semesterStart": "2025-08-31T16:00:00.000Z"
+}
