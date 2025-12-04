@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Check, Edit2, RotateCw, X, BookOpen, ArrowLeft, Sparkles, Clock, Calendar, Calculator, Trash2, Send, Link as LinkIcon, ExternalLink, BarChart2, Cloud, Settings, PieChart, Globe, Save, AlertCircle, History, Archive } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Check, Edit2, RotateCw, X, BookOpen, ArrowLeft, Sparkles, Clock, Calendar, Calculator, Trash2, Send, Link as LinkIcon, ExternalLink, BarChart2, Cloud, Settings, PieChart, Globe, Save, AlertCircle, History, Archive, Moon, Sun, Upload, Download } from 'lucide-react';
 
 // --- 多語言翻譯字典 ---
 const TRANSLATIONS = {
@@ -14,8 +14,8 @@ const TRANSLATIONS = {
     close: '關閉',
     loading: '資料載入中...',
     saving: '儲存中...',
-    saved: '已儲存',
-    save_error: '儲存失敗 (離線模式)',
+    saved: '已儲存 (本機)',
+    save_error: '儲存失敗',
     idle: '準備就緒',
     week: '週',
     mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六', sun: '週日',
@@ -29,10 +29,17 @@ const TRANSLATIONS = {
     settings: '設定',
     semester_settings: '學期設定',
     language_settings: '語言 / Language',
+    theme_settings: '外觀 / Theme',
+    theme_light: '淺色模式',
+    theme_dark: '深色模式',
     semester_start: '學期開始日 (第一週週一)',
     semester_total_weeks: '學期總週數',
     custom: '自訂',
     save_settings: '儲存設定',
+    export_data: '匯出備份 (JSON)',
+    import_data: '匯入備份',
+    data_management: '資料管理',
+    confirm_import: '匯入將會覆蓋現有資料，確定要繼續嗎？',
 
     // 側邊欄 & 功能標題
     timetable: '課表',
@@ -44,7 +51,7 @@ const TRANSLATIONS = {
     pomodoro: '番茄鐘',
     links: '常用連結',
     user_name: 'User',
-    user_role: 'Student Account',
+    user_role: 'Local Account',
 
     // 聯絡簿
     no_tasks: '無待辦',
@@ -53,6 +60,10 @@ const TRANSLATIONS = {
     confirm_delete_task: '確定要刪除「{subject}」嗎？',
     subject_placeholder: '科目...',
     note_placeholder: '備註...',
+    import_ics: '匯入 .ics',
+    ics_format_hint: '支援標準 iCalendar (.ics) 格式 (自動歸類為其他)',
+    import_success: '成功匯入 {count} 筆事項',
+    import_error: '匯入失敗，請檢查檔案格式 (.ics)',
     
     // Categories
     'categories.exam': '考試',
@@ -121,7 +132,7 @@ const TRANSLATIONS = {
     record_saved: '已記錄「{subject}」。',
 
     // AI
-    ai_welcome: '嗨！我是 StudyHub 助理。我會優先嘗試連線您的本地 AI 模型，若無法連線則使用基本查詢功能。',
+    ai_welcome: '嗨！我是 StudyHub 助理。目前為純前端模式，我僅能進行簡單的資料查詢。',
     ai_thinking: '思考中...',
     ai_input_placeholder: '詢問關於您的課表、成績...',
     ai_preset_today_class: '今天有什麼課？',
@@ -130,8 +141,8 @@ const TRANSLATIONS = {
     ai_preset_homework: '什麼時候有作業？',
     ai_preset_score: '我的成績如何？',
     ai_preview_prefix: '(離線模式 - 僅查詢資料庫)\n根據您的資料庫：\n',
-    ai_preview_suffix: '\n\n(若要使用完整 AI 功能，請確保後端伺服器與 LM Studio 已啟動)',
-    ai_reject: '(系統訊息)\n抱歉，離線模式下我只能回答關於您的 **課表、成績、聯絡簿** 或 **今日行程** 的問題。',
+    ai_preview_suffix: '\n\n(提示：您可以使用「匯出備份」功能來保存您的資料)',
+    ai_reject: '(系統訊息)\n離線模式下我只能回答關於您的 **課表、成績、聯絡簿** 或 **今日行程** 的問題。',
     today_highlight: '【今日 ({date}) 重點】',
     db_overview: '【資料庫全覽】',
     all_planner: '所有聯絡簿：',
@@ -156,8 +167,8 @@ const TRANSLATIONS = {
     close: 'Close',
     loading: 'Loading...',
     saving: 'Saving...',
-    saved: 'Saved',
-    save_error: 'Error (Offline)',
+    saved: 'Saved (Local)',
+    save_error: 'Error',
     idle: 'Ready',
     week: 'Week',
     mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
@@ -170,10 +181,17 @@ const TRANSLATIONS = {
     settings: 'Settings',
     semester_settings: 'Semester Settings',
     language_settings: 'Language',
+    theme_settings: 'Appearance',
+    theme_light: 'Light Mode',
+    theme_dark: 'Dark Mode',
     semester_start: 'Semester Start Date (First Monday)',
     semester_total_weeks: 'Total Weeks',
     custom: 'Custom',
     save_settings: 'Save Settings',
+    export_data: 'Export Backup (JSON)',
+    import_data: 'Import Backup',
+    data_management: 'Data Management',
+    confirm_import: 'Importing will overwrite existing data. Continue?',
 
     timetable: 'Timetable',
     planner: 'Planner',
@@ -184,7 +202,7 @@ const TRANSLATIONS = {
     pomodoro: 'Pomodoro',
     links: 'Links',
     user_name: 'User',
-    user_role: 'Student Account',
+    user_role: 'Local Account',
 
     no_tasks: 'No Tasks',
     no_tasks_today: 'No schedule today',
@@ -192,6 +210,10 @@ const TRANSLATIONS = {
     confirm_delete_task: 'Delete "{subject}"?',
     subject_placeholder: 'Subject...',
     note_placeholder: 'Note...',
+    import_ics: 'Import .ics',
+    ics_format_hint: 'Standard iCalendar (.ics) format (Categorized as Other)',
+    import_success: 'Successfully imported {count} items',
+    import_error: 'Import failed. Check file format (.ics)',
     
     // Categories
     'categories.exam': 'Exam',
@@ -255,7 +277,7 @@ const TRANSLATIONS = {
     break_end: 'Break ended!',
     record_saved: 'Recorded "{subject}".',
 
-    ai_welcome: 'Hi! I will try to connect to your local AI model first, otherwise I will use basic query functions.',
+    ai_welcome: 'Hi! I am StudyHub Assistant (Offline Mode). I can help you query your local data.',
     ai_thinking: 'Thinking...',
     ai_input_placeholder: 'Ask about schedule, grades...',
     ai_preset_today_class: 'Classes today?',
@@ -263,8 +285,8 @@ const TRANSLATIONS = {
     ai_preset_report: 'When is the report due?',
     ai_preset_homework: 'Any homework?',
     ai_preset_score: 'How are my grades?',
-    ai_preview_prefix: '(Offline - DB Query Only)\nBased on your data:\n',
-    ai_preview_suffix: '\n\n(For full AI features, ensure backend & LM Studio are running)',
+    ai_preview_prefix: '(Offline Mode)\nBased on your data:\n',
+    ai_preview_suffix: '\n\n(Tip: You can use "Export Backup" to save your data)',
     ai_reject: '(System)\nOffline mode: I can only answer questions about your **Timetable, Grades, Planner** or **Today\'s Schedule**.',
     today_highlight: '【Today ({date}) Highlights】',
     db_overview: '【Database Overview】',
@@ -289,8 +311,8 @@ const TRANSLATIONS = {
     close: '閉じる',
     loading: '読み込み中...',
     saving: '保存中...',
-    saved: '保存完了',
-    save_error: '保存失敗 (オフライン)',
+    saved: '保存完了 (ローカル)',
+    save_error: '保存失敗',
     idle: '準備完了',
     week: '週',
     mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日',
@@ -303,10 +325,17 @@ const TRANSLATIONS = {
     settings: '設定',
     semester_settings: '学期設定',
     language_settings: '言語 / Language',
+    theme_settings: '外観 / Theme',
+    theme_light: 'ライト',
+    theme_dark: 'ダーク',
     semester_start: '学期開始日 (最初の月曜日)',
     semester_total_weeks: '総週数',
     custom: 'カスタム',
     save_settings: '設定を保存',
+    export_data: 'バックアップをエクスポート',
+    import_data: 'バックアップをインポート',
+    data_management: 'データ管理',
+    confirm_import: '既存のデータが上書きされます。よろしいですか？',
 
     timetable: '時間割',
     planner: '連絡帳',
@@ -317,7 +346,7 @@ const TRANSLATIONS = {
     pomodoro: 'ポモドーロ',
     links: 'リンク集',
     user_name: 'User',
-    user_role: 'Student Account',
+    user_role: 'Local Account',
 
     no_tasks: 'なし',
     no_tasks_today: '今日の予定はありません',
@@ -325,6 +354,10 @@ const TRANSLATIONS = {
     confirm_delete_task: '「{subject}」を削除しますか？',
     subject_placeholder: '科目...',
     note_placeholder: 'メモ...',
+    import_ics: '.icsインポート',
+    ics_format_hint: '標準iCalendar(.ics)形式 (その他に分類されます)',
+    import_success: '{count} 件をインポートしました',
+    import_error: 'インポート失敗。形式を確認してください (.ics)',
     
     // Categories
     'categories.exam': '試験',
@@ -388,7 +421,7 @@ const TRANSLATIONS = {
     break_end: '休憩終了！',
     record_saved: '「{subject}」を記録しました。',
 
-    ai_welcome: 'こんにちは！ローカルAIへの接続を試みます。接続できない場合は基本機能を使用します。',
+    ai_welcome: 'こんにちは！StudyHub アシスタントです（オフラインモード）。ローカルデータの検索をお手伝いします。',
     ai_thinking: '考え中...',
     ai_input_placeholder: '時間割や成績について聞く...',
     ai_preset_today_class: '今日の授業は？',
@@ -396,8 +429,8 @@ const TRANSLATIONS = {
     ai_preset_report: 'レポートの締切は？',
     ai_preset_homework: '宿題はある？',
     ai_preset_score: '成績はどう？',
-    ai_preview_prefix: '(オフライン - DB検索のみ)\nデータに基づいて：\n',
-    ai_preview_suffix: '\n\n(完全な機能にはバックエンド接続が必要です)',
+    ai_preview_prefix: '(オフラインモード)\nデータに基づいて：\n',
+    ai_preview_suffix: '\n\n(ヒント: 「バックアップをエクスポート」でデータを保存できます)',
     ai_reject: '(システム)\nオフラインモード: **時間割、成績、連絡帳** または **今日の予定** についてのみ回答できます。',
     today_highlight: '【今日 ({date}) のハイライト】',
     db_overview: '【データベース概要】',
@@ -415,12 +448,13 @@ const TRANSLATIONS = {
 };
 
 // --- 設定區 ---
+// 為深色模式新增 dark:text-xxx 類別
 const CATEGORIES = {
-  EXAM: { id: 'exam', key: 'exam', color: 'bg-red-500', border: 'border-l-4 border-red-500', text: 'text-red-700' },
-  REPORT: { id: 'report', key: 'report', color: 'bg-green-500', border: 'border-l-4 border-green-500', text: 'text-green-700' },
-  HOMEWORK: { id: 'homework', key: 'homework', color: 'bg-purple-500', border: 'border-l-4 border-purple-500', text: 'text-purple-700' },
-  CANCEL: { id: 'cancel', key: 'cancel', color: 'bg-yellow-400', border: 'border-l-4 border-yellow-400', text: 'text-yellow-700' },
-  OTHER: { id: 'other', key: 'other', color: 'bg-blue-400', border: 'border-l-4 border-blue-400', text: 'text-blue-700' }
+  EXAM: { id: 'exam', key: 'exam', color: 'bg-red-500', border: 'border-l-4 border-red-500', text: 'text-red-700 dark:text-red-400' },
+  REPORT: { id: 'report', key: 'report', color: 'bg-green-500', border: 'border-l-4 border-green-500', text: 'text-green-700 dark:text-green-400' },
+  HOMEWORK: { id: 'homework', key: 'homework', color: 'bg-purple-500', border: 'border-l-4 border-purple-500', text: 'text-purple-700 dark:text-purple-400' },
+  CANCEL: { id: 'cancel', key: 'cancel', color: 'bg-yellow-400', border: 'border-l-4 border-yellow-400', text: 'text-yellow-700 dark:text-yellow-400' },
+  OTHER: { id: 'other', key: 'other', color: 'bg-blue-400', border: 'border-l-4 border-blue-400', text: 'text-blue-700 dark:text-blue-400' }
 };
 
 // GPA 對照表 (4.3制)
@@ -471,6 +505,34 @@ export default function StudyHubApp() {
   const [currentDate, setCurrentDate] = useState(new Date()); 
   const [language, setLanguage] = useState('zh-TW'); 
   
+  // 初始化主題 (安全地讀取 localStorage)
+  const [theme, setTheme] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return localStorage.getItem('theme') || 'light';
+      }
+    } catch (e) {
+      console.warn("LocalStorage not available for theme, defaulting to light.");
+    }
+    return 'light';
+  });
+
+  // 處理主題切換
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+        root.classList.add('dark');
+    } else {
+        root.classList.remove('dark');
+    }
+    
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      // 忽略錯誤 (例如無痕模式)
+    }
+  }, [theme]);
+
   const t = (key, params = {}) => {
     let text = TRANSLATIONS[language][key] || key;
     Object.keys(params).forEach(param => {
@@ -515,39 +577,11 @@ export default function StudyHubApp() {
   // 新增：歷史學期存檔
   const [archivedSemesters, setArchivedSemesters] = useState([]);
 
-  // --- 資料庫整合邏輯 (Hybrid: API first, LocalStorage fallback) ---
+  // --- 純前端 LocalStorage 邏輯 (無後端) ---
 
   useEffect(() => {
+    // 讀取 LocalStorage
     const fetchData = async () => {
-      try {
-        // 1. 嘗試從後端讀取
-        const res = await fetch('/api/data');
-        if (res.ok) {
-          const data = await res.json();
-          if (Object.keys(data).length > 0) {
-            if (data.tasks) setTasks(data.tasks);
-            if (data.grades) setGrades(data.grades);
-            if (data.timetable) setTimetable(data.timetable);
-            if (data.periodTimes) setPeriodTimes(data.periodTimes);
-            if (data.gpaCourses) setGpaCourses(data.gpaCourses);
-            if (data.links) setLinks(data.links);
-            if (data.studyLogs) setStudyLogs(data.studyLogs);
-            if (data.pomodoroSubjects) setPomodoroSubjects(data.pomodoroSubjects);
-            if (data.currentDate) setCurrentDate(new Date(data.currentDate));
-            if (data.semesterStart) setSemesterStart(new Date(data.semesterStart));
-            if (data.semesterWeeks) setSemesterWeeks(data.semesterWeeks);
-            if (data.courseCriteria) setCourseCriteria(data.courseCriteria);
-            if (data.language) setLanguage(data.language); 
-            if (data.archivedSemesters) setArchivedSemesters(data.archivedSemesters);
-            setIsDataLoaded(true);
-            return;
-          }
-        }
-      } catch (e) {
-        console.log("Backend not connected, loading from localStorage");
-      }
-
-      // 2. 後端失敗或無資料，讀取 LocalStorage
       try {
         const savedData = localStorage.getItem('studyhub_data');
         if (savedData) {
@@ -623,29 +657,11 @@ export default function StudyHubApp() {
           archivedSemesters
       };
 
-      try {
-        // 1. 嘗試儲存到後端
-        const res = await fetch('/api/data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        if (res.ok) {
-            setSaveStatus('saved');
-            // 同時更新 localStorage 作為備份
-            localStorage.setItem('studyhub_data', JSON.stringify(payload));
-            return;
-        }
-      } catch (e) {
-        console.warn("Backend save failed, using localStorage");
-      }
-
-      // 2. 後端失敗，儲存到 LocalStorage
+      // 僅儲存到 LocalStorage
       try {
         localStorage.setItem('studyhub_data', JSON.stringify(payload));
         await new Promise(r => setTimeout(r, 300));
-        setSaveStatus('saved'); // 或顯示 'offline'
+        setSaveStatus('saved'); 
       } catch (e) {
         console.error("Save error:", e);
         setSaveStatus('error');
@@ -716,10 +732,10 @@ export default function StudyHubApp() {
   // --- 新版網頁介面元件 ---
 
   const Sidebar = () => (
-    <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col transition-all duration-300 z-20">
-      <div className="h-16 flex items-center px-6 border-b border-gray-100">
-        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2 tracking-tight">
-          <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
+    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 flex flex-col transition-all duration-300 z-20">
+      <div className="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800">
+        <h1 className="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center gap-2 tracking-tight">
+          <div className="w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-lg flex items-center justify-center">
             <span className="font-serif italic">S</span>
           </div>
           StudyHub
@@ -743,8 +759,8 @@ export default function StudyHubApp() {
             className={`
               w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all
               ${activeTab === item.id 
-                ? (item.special ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-black text-white shadow-md shadow-gray-200') 
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}
+                ? (item.special ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 shadow-md shadow-gray-200 dark:shadow-none') 
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'}
             `}
           >
             {item.icon}
@@ -754,14 +770,14 @@ export default function StudyHubApp() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
-        <div className="bg-gray-50 rounded-xl p-3 flex items-center gap-3 border border-gray-100">
+      <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 flex items-center gap-3 border border-gray-100 dark:border-gray-700">
            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
              U
            </div>
            <div>
-             <div className="text-xs font-bold text-gray-900">{t('user_name')}</div>
-             <div className="text-[10px] text-gray-500">{t('user_role')}</div>
+             <div className="text-xs font-bold text-gray-900 dark:text-gray-100">{t('user_name')}</div>
+             <div className="text-[10px] text-gray-500 dark:text-gray-400">{t('user_role')}</div>
            </div>
         </div>
       </div>
@@ -772,11 +788,72 @@ export default function StudyHubApp() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [tempStart, setTempStart] = useState(getLocalDateString(semesterStart));
     const [tempWeeks, setTempWeeks] = useState(semesterWeeks);
+    const fileImportRef = useRef(null);
 
     const handleSaveSettings = () => {
         setSemesterStart(new Date(tempStart));
         setSemesterWeeks(parseInt(tempWeeks));
         setIsSettingsOpen(false);
+    };
+
+    // 匯出功能
+    const exportData = () => {
+        const payload = {
+            tasks, grades, timetable, periodTimes, gpaCourses, links, studyLogs, pomodoroSubjects,
+            currentDate: currentDate.toISOString(),
+            semesterStart: semesterStart.toISOString(),
+            semesterWeeks,
+            courseCriteria,
+            language,
+            archivedSemesters
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "studyhub_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    };
+
+    // 匯入功能
+    const importData = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!window.confirm(t('confirm_import'))) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data) {
+                    if (data.tasks) setTasks(data.tasks);
+                    if (data.grades) setGrades(data.grades);
+                    if (data.timetable) setTimetable(data.timetable);
+                    if (data.periodTimes) setPeriodTimes(data.periodTimes);
+                    if (data.gpaCourses) setGpaCourses(data.gpaCourses);
+                    if (data.links) setLinks(data.links);
+                    if (data.studyLogs) setStudyLogs(data.studyLogs);
+                    if (data.pomodoroSubjects) setPomodoroSubjects(data.pomodoroSubjects);
+                    if (data.currentDate) setCurrentDate(new Date(data.currentDate));
+                    if (data.semesterStart) setSemesterStart(new Date(data.semesterStart));
+                    if (data.semesterWeeks) setSemesterWeeks(data.semesterWeeks);
+                    if (data.courseCriteria) setCourseCriteria(data.courseCriteria);
+                    if (data.language) setLanguage(data.language); 
+                    if (data.archivedSemesters) setArchivedSemesters(data.archivedSemesters);
+                    
+                    // 立即儲存
+                    localStorage.setItem('studyhub_data', JSON.stringify(data));
+                    alert('匯入成功！');
+                    window.location.reload(); // 重新整理以確保狀態一致
+                }
+            } catch (err) {
+                console.error(err);
+                alert('匯入失敗：檔案格式錯誤');
+            }
+        };
+        reader.readAsText(file);
     };
 
     const todayDateString = new Intl.DateTimeFormat(language === 'en' ? 'en-US' : (language === 'ja' ? 'ja-JP' : 'zh-TW'), {
@@ -787,19 +864,19 @@ export default function StudyHubApp() {
     }).format(new Date());
 
     return (
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-10 sticky top-0">
+        <header className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 flex-shrink-0 z-10 sticky top-0 transition-colors">
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-gray-100/50 p-1 rounded-lg border border-gray-200/50">
+            <div className="flex items-center gap-1 bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
                 <button onClick={() => {
                 const newDate = new Date(currentDate);
                 newDate.setDate(newDate.getDate() - 7);
                 setCurrentDate(newDate);
-                }} className="p-1.5 hover:bg-white hover:shadow-sm rounded-md text-gray-500 transition-all">
+                }} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm rounded-md text-gray-500 dark:text-gray-400 transition-all">
                 <ChevronLeft size={16} />
                 </button>
                 
                 {/* 日期選擇器區域 */}
-                <div className="flex flex-col items-center px-3 min-w-[120px] relative group cursor-pointer hover:bg-gray-200/50 rounded transition-colors" title="點擊選擇日期">
+                <div className="flex flex-col items-center px-3 min-w-[120px] relative group cursor-pointer hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded transition-colors" title="點擊選擇日期">
                     <input 
                         type="date" 
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -821,21 +898,21 @@ export default function StudyHubApp() {
                             }
                         }}
                     />
-                    <span className="text-xs font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {weekDays[0].getMonth()+1}/{weekDays[0].getDate()} - {weekDays[6].getMonth()+1}/{weekDays[6].getDate()}
                     </span>
                     
                     {currentWeekNum <= 0 && (
-                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-gray-50 text-gray-500">
+                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
                             {t('pre_semester')}
                         </span>
                     )}
                     {currentWeekNum > 0 && currentWeekNum <= semesterWeeks ? (
-                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-blue-50 text-blue-600">
+                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                             {t('semester_week')} {currentWeekNum} {t('week_suffix')}
                         </span>
                     ) : currentWeekNum > semesterWeeks && (
-                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-red-50 text-red-500">
+                        <span className="text-[10px] font-bold px-2 rounded-full mt-0.5 bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400">
                             {t('semester_ended')}
                         </span>
                     )}
@@ -845,16 +922,16 @@ export default function StudyHubApp() {
                 const newDate = new Date(currentDate);
                 newDate.setDate(newDate.getDate() + 7);
                 setCurrentDate(newDate);
-                }} className="p-1.5 hover:bg-white hover:shadow-sm rounded-md text-gray-500 transition-all">
+                }} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm rounded-md text-gray-500 dark:text-gray-400 transition-all">
                 <ChevronRight size={16} />
                 </button>
             </div>
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2 font-bold text-gray-700 text-sm hidden md:block">
+        <div className="absolute left-1/2 transform -translate-x-1/2 font-bold text-gray-700 dark:text-gray-200 text-sm hidden md:block">
             <button 
                 onClick={() => setCurrentDate(new Date())}
-                className="hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
                 title="點擊回到今天"
             >
                 {todayDateString}
@@ -862,22 +939,31 @@ export default function StudyHubApp() {
         </div>
 
         <div className="flex items-center gap-4">
+            {/* 主題切換按鈕 */}
+            <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all"
+                title={theme === 'dark' ? t('theme_light') : t('theme_dark')}
+            >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
             <button 
                 onClick={() => {
                     setTempStart(getLocalDateString(semesterStart));
                     setTempWeeks(semesterWeeks);
                     setIsSettingsOpen(true);
                 }}
-                className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+                className="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all"
                 title={t('settings')}
             >
                 <Settings size={20} />
             </button>
 
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border
-                ${saveStatus === 'saving' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
-                saveStatus === 'saved' ? 'bg-green-50 text-green-600 border-green-100' : 
-                saveStatus === 'error' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                ${saveStatus === 'saving' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800' : 
+                saveStatus === 'saved' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 
+                saveStatus === 'error' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700'}`}>
                 <Cloud size={14} />
                 <span>
                 {saveStatus === 'saving' && t('saving')}
@@ -889,21 +975,21 @@ export default function StudyHubApp() {
         </div>
 
         {isSettingsOpen && (
-            <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-end p-4 animate-in fade-in">
-                <div className="bg-white w-80 rounded-2xl p-5 shadow-2xl mt-16 border border-gray-200 mr-2">
-                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><Settings size={16}/> {t('settings')}</h3>
-                        <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={18}/></button>
+            <div className="fixed inset-0 bg-black/20 dark:bg-black/50 z-50 flex items-start justify-end p-4 animate-in fade-in">
+                <div className="bg-white dark:bg-gray-900 w-80 rounded-2xl p-5 shadow-2xl mt-16 border border-gray-200 dark:border-gray-800 mr-2">
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
+                        <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2"><Settings size={16}/> {t('settings')}</h3>
+                        <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"><X size={18}/></button>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-xs font-bold text-gray-500 mb-1.5 block flex items-center gap-1"><Globe size={12}/> {t('language_settings')}</label>
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 block flex items-center gap-1"><Globe size={12}/> {t('language_settings')}</label>
                             <div className="flex gap-2">
                                 {[{code: 'zh-TW', label: '繁體中文'}, {code: 'en', label: 'English'}, {code: 'ja', label: '日本語'}].map(lang => (
                                     <button 
                                         key={lang.code}
                                         onClick={() => setLanguage(lang.code)}
-                                        className={`flex-1 py-2 text-xs font-bold rounded-lg border transition-all ${language === lang.code ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'}`}
+                                        className={`flex-1 py-2 text-xs font-bold rounded-lg border transition-all ${language === lang.code ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 border-black dark:border-gray-100' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'}`}
                                     >
                                         {lang.label}
                                     </button>
@@ -911,32 +997,69 @@ export default function StudyHubApp() {
                             </div>
                         </div>
 
-                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="border-t border-gray-100 dark:border-gray-800 my-2"></div>
 
                         <div>
-                            <label className="text-xs font-bold text-gray-500 mb-1.5 block">{t('semester_start')}</label>
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 block flex items-center gap-1">
+                                {theme === 'dark' ? <Moon size={12}/> : <Sun size={12}/>} {t('theme_settings')}
+                            </label>
+                            <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                <button 
+                                    onClick={() => setTheme('light')}
+                                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${theme === 'light' ? 'bg-white text-black shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}
+                                >
+                                    <Sun size={14}/> {t('theme_light')}
+                                </button>
+                                <button 
+                                    onClick={() => setTheme('dark')}
+                                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${theme === 'dark' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}
+                                >
+                                    <Moon size={14}/> {t('theme_dark')}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-gray-100 dark:border-gray-800 my-2"></div>
+
+                        <div>
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 block">{t('data_management')}</label>
+                            <div className="flex gap-2">
+                                <button onClick={exportData} className="flex-1 flex items-center justify-center gap-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                                    <Download size={14}/> {t('export_data')}
+                                </button>
+                                <button onClick={() => fileImportRef.current.click()} className="flex-1 flex items-center justify-center gap-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                                    <Upload size={14}/> {t('import_data')}
+                                </button>
+                                <input type="file" ref={fileImportRef} accept=".json" className="hidden" onChange={importData} />
+                            </div>
+                        </div>
+
+                        <div className="border-t border-gray-100 dark:border-gray-800 my-2"></div>
+
+                        <div>
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 block">{t('semester_start')}</label>
                             <input 
                                 type="date" 
-                                className="w-full border border-gray-300 rounded-xl p-2.5 text-sm outline-none focus:border-black transition-colors"
+                                className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 text-sm outline-none focus:border-black dark:focus:border-gray-500 transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                                 value={tempStart}
                                 onChange={(e) => setTempStart(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold text-gray-500 mb-1.5 block">{t('semester_total_weeks')}</label>
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 block">{t('semester_total_weeks')}</label>
                             <div className="flex gap-2">
                                 {[16, 18].map(w => (
                                     <button 
                                         key={w}
                                         onClick={() => setTempWeeks(w)}
-                                        className={`flex-1 py-2 text-xs font-bold rounded-lg border transition-all ${parseInt(tempWeeks) === w ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'}`}
+                                        className={`flex-1 py-2 text-xs font-bold rounded-lg border transition-all ${parseInt(tempWeeks) === w ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 border-black dark:border-gray-100' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'}`}
                                     >
                                         {w}{t('week')}
                                     </button>
                                 ))}
                                 <input 
                                     type="number" 
-                                    className="w-16 border border-gray-300 rounded-lg p-2 text-sm text-center outline-none focus:border-black"
+                                    className="w-16 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-center outline-none focus:border-black dark:focus:border-gray-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                                     value={tempWeeks}
                                     onChange={(e) => setTempWeeks(e.target.value)}
                                     placeholder={t('custom')}
@@ -946,7 +1069,7 @@ export default function StudyHubApp() {
                         <div className="pt-2">
                             <button 
                                 onClick={handleSaveSettings}
-                                className="w-full bg-black text-white py-2.5 rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors"
+                                className="w-full bg-black dark:bg-gray-100 text-white dark:text-gray-900 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
                             >
                                 {t('save_settings')}
                             </button>
@@ -959,8 +1082,22 @@ export default function StudyHubApp() {
     );
   };
 
-  // --- Views ---
+  // --- Views (LinksView, AIChatView, TimetableView, PomodoroView, GpaView, GradesView, DashboardView, PlannerView 保持不變) ---
+  
+  // (以下省略 Views 程式碼以節省空間，請保持原樣)
+  // ... (LinksView code)
+  // ... (AIChatView code)
+  // ... (TimetableView code)
+  // ... (PomodoroView code)
+  // ... (GpaView code)
+  // ... (GradesView code)
+  // ... (DashboardView code)
+  // ... (PlannerView code)
 
+  // 這裡為了完整性，將之前的 LinksView 等元件全部放回來 (因為是單一檔案)
+  // ... 
+  
+  // (為確保程式碼完整，以下重複貼上先前的 View 元件)
   const LinksView = ({ links, setLinks }) => {
       const [isAdding, setIsAdding] = useState(false);
       const [newLink, setNewLink] = useState({ title: '', url: '' });
@@ -989,7 +1126,7 @@ export default function StudyHubApp() {
                                   e.stopPropagation();
                                   confirmDelete(link.id, link.title);
                               }}
-                              className="absolute top-2 right-2 z-10 p-1.5 bg-white/90 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                              className="absolute top-2 right-2 z-10 p-1.5 bg-white/90 dark:bg-gray-800/90 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all shadow-sm opacity-0 group-hover:opacity-100"
                           >
                               <X size={14} />
                           </button>
@@ -998,9 +1135,9 @@ export default function StudyHubApp() {
                               href={link.url} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer no-underline text-gray-700 h-full"
+                              className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center gap-3 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all cursor-pointer no-underline text-gray-700 dark:text-gray-200 h-full"
                           >
-                              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
                                   <LinkIcon size={24} />
                               </div>
                               <span className="font-bold text-sm text-center line-clamp-1 w-full px-1">{link.title}</span>
@@ -1013,7 +1150,7 @@ export default function StudyHubApp() {
                   
                   <button 
                     onClick={() => setIsAdding(true)}
-                    className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 transition-all h-40"
+                    className="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all h-40"
                   >
                       <Plus size={24} />
                       <span className="text-xs font-bold">{t('add_link')}</span>
@@ -1022,13 +1159,13 @@ export default function StudyHubApp() {
 
               {isAdding && (
                   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-                      <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl">
-                          <h3 className="font-bold text-lg mb-4 text-gray-800">{t('add_link')}</h3>
-                          <input placeholder={t('link_name_placeholder')} className="w-full border border-gray-300 rounded-xl p-3 mb-3 text-sm focus:border-black outline-none" value={newLink.title} onChange={e => setNewLink({...newLink, title: e.target.value})} />
-                          <input placeholder={t('link_url_placeholder')} className="w-full border border-gray-300 rounded-xl p-3 mb-5 text-sm focus:border-black outline-none" value={newLink.url} onChange={e => setNewLink({...newLink, url: e.target.value})} />
+                      <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
+                          <h3 className="font-bold text-lg mb-4 text-gray-800 dark:text-gray-100">{t('add_link')}</h3>
+                          <input placeholder={t('link_name_placeholder')} className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 mb-3 text-sm focus:border-black dark:focus:border-gray-500 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={newLink.title} onChange={e => setNewLink({...newLink, title: e.target.value})} />
+                          <input placeholder={t('link_url_placeholder')} className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 mb-5 text-sm focus:border-black dark:focus:border-gray-500 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={newLink.url} onChange={e => setNewLink({...newLink, url: e.target.value})} />
                           <div className="flex gap-3">
-                              <button onClick={() => setIsAdding(false)} className="flex-1 py-3 bg-gray-100 rounded-xl text-sm font-bold">{t('cancel')}</button>
-                              <button onClick={addLink} className="flex-1 py-3 bg-black text-white rounded-xl text-sm font-bold">{t('confirm')}</button>
+                              <button onClick={() => setIsAdding(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">{t('cancel')}</button>
+                              <button onClick={addLink} className="flex-1 py-3 bg-black dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">{t('confirm')}</button>
                           </div>
                       </div>
                   </div>
@@ -1084,28 +1221,7 @@ export default function StudyHubApp() {
         if (typeof text !== 'string') setInput(''); 
         setIsSending(true);
 
-        // 1. 嘗試呼叫後端 API
-        try {
-            const context = getSystemContext();
-            const apiMessages = [{ role: 'system', content: context }, ...newMessages];
-            
-            const response = await fetch('/api/chat', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ messages: apiMessages }) 
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-                setIsSending(false);
-                return; // 成功後直接返回
-            }
-        } catch (error) {
-            console.log("Backend API not available, switching to local mode.");
-        }
-        
-        // 2. 如果後端失敗，使用前端模擬回應 (Fallback)
+        // 純前端模式：直接模擬回應
         setTimeout(() => {
             const dbKeywords = /課|行程|表|time|schedule|today|今天|成績|grade|score|gpa|聯絡簿|作業|考試|report|homework|exam/i;
             const isAskingAboutDB = dbKeywords.test(userMsg.content);
@@ -1132,28 +1248,28 @@ export default function StudyHubApp() {
     ];
 
     return (
-        <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {messages.map((msg, idx) => ( <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[70%] rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${msg.role === 'user' ? 'bg-black text-white rounded-br-none' : 'bg-gray-100 text-gray-800 border border-gray-200 rounded-bl-none'}`}>{msg.content}</div></div> ))}
+                {messages.map((msg, idx) => ( <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[70%] rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${msg.role === 'user' ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 rounded-br-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-600 rounded-bl-none'}`}>{msg.content}</div></div> ))}
                 {isSending && <div className="text-gray-400 text-xs ml-4 animate-pulse">{t('ai_thinking')}</div>}
                 <div ref={messagesEndRef} />
             </div>
             
-            <div className="bg-gray-50 border-t border-gray-200">
+            <div className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex gap-2 p-3 overflow-x-auto no-scrollbar">
                     {presetQuestions.map((q, idx) => (
                         <button 
                             key={idx} 
                             onClick={() => handleSend(q)}
-                            className="whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition-all shadow-sm"
+                            className="whitespace-nowrap px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400 transition-all shadow-sm"
                         >
                             {q}
                         </button>
                     ))}
                 </div>
                 <div className="p-4 pt-0 flex gap-3">
-                    <input type="text" placeholder={t('ai_input_placeholder')} className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} />
-                    <button onClick={() => handleSend()} disabled={isSending || !input.trim()} className="bg-black text-white p-3 rounded-xl hover:bg-gray-800 transition-colors disabled:bg-gray-300"><Send size={18} /></button>
+                    <input type="text" placeholder={t('ai_input_placeholder')} className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-sm outline-none focus:border-black dark:focus:border-gray-400 focus:ring-1 focus:ring-black dark:focus:ring-gray-400 transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} />
+                    <button onClick={() => handleSend()} disabled={isSending || !input.trim()} className="bg-black dark:bg-gray-100 text-white dark:text-gray-900 p-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-600"><Send size={18} /></button>
                 </div>
             </div>
         </div>
@@ -1209,25 +1325,25 @@ export default function StudyHubApp() {
 
       return (
           <div className="h-full flex flex-col">
-              <div className="flex-1 overflow-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+              <div className="flex-1 overflow-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
                 <div className="min-w-[800px]">
-                    <div className="grid grid-cols-[60px_100px_repeat(7,1fr)] text-center text-sm font-bold bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-                        <div className="p-3 border-r border-gray-200 text-gray-500">{t('period')}</div>
-                        <div className="p-3 border-r border-gray-200 text-gray-500">{t('time')}</div>
-                        {days.map(d => <div key={d} className="p-3 border-r border-gray-200 last:border-0 text-gray-700">{d}</div>)}
+                    <div className="grid grid-cols-[60px_100px_repeat(7,1fr)] text-center text-sm font-bold bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+                        <div className="p-3 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">{t('period')}</div>
+                        <div className="p-3 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">{t('time')}</div>
+                        {days.map(d => <div key={d} className="p-3 border-r border-gray-200 dark:border-gray-700 last:border-0 text-gray-700 dark:text-gray-200">{d}</div>)}
                     </div>
                     {periods.map(p => (
-                        <div key={p} className="grid grid-cols-[60px_100px_repeat(7,1fr)] text-center text-sm h-16 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-                            <div className="flex items-center justify-center bg-gray-50 text-gray-500 font-bold border-r border-gray-200">{p}</div>
+                        <div key={p} className="grid grid-cols-[60px_100px_repeat(7,1fr)] text-center text-sm h-16 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+                            <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 font-bold border-r border-gray-200 dark:border-gray-700">{p}</div>
                             
-                            <div onClick={() => handleTimeClick(p)} className={`flex flex-col items-center justify-center border-r border-gray-200 p-1 h-full text-xs text-gray-500 ${isEditing ? 'cursor-pointer hover:bg-indigo-50' : ''}`}>
+                            <div onClick={() => handleTimeClick(p)} className={`flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-700 p-1 h-full text-xs text-gray-500 dark:text-gray-400 ${isEditing ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : ''}`}>
                                 {(() => {
                                     const tVal = periodTimes[p] || "";
                                     if (tVal.includes('-')) {
                                         const [start, end] = tVal.split('-');
-                                        return (<><div>{start}</div><div className="text-gray-300">|</div><div>{end}</div></>);
+                                        return (<><div>{start}</div><div className="text-gray-300 dark:text-gray-600">|</div><div>{end}</div></>);
                                     }
-                                    return tVal || (isEditing ? <span className="text-indigo-300">{t('setting_hint')}</span> : "");
+                                    return tVal || (isEditing ? <span className="text-indigo-300 dark:text-indigo-400">{t('setting_hint')}</span> : "");
                                 })()}
                             </div>
 
@@ -1235,11 +1351,11 @@ export default function StudyHubApp() {
                                 const key = `${dayIdx + 1}-${p}`;
                                 const subject = timetable[key];
                                 return (
-                                    <div key={key} onClick={() => handleCellClick(dayIdx, p)} className={`flex items-center justify-center p-1 border-r border-gray-100 last:border-0 ${isEditing ? 'cursor-pointer hover:bg-indigo-50' : ''}`}>
+                                    <div key={key} onClick={() => handleCellClick(dayIdx, p)} className={`flex items-center justify-center p-1 border-r border-gray-100 dark:border-gray-700 last:border-0 ${isEditing ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : ''}`}>
                                         {subject ? (
-                                            <div className="bg-indigo-50 text-indigo-700 rounded-lg px-2 py-1 w-full h-full flex items-center justify-center text-xs font-bold break-all leading-tight border border-indigo-100 shadow-sm">{subject}</div>
+                                            <div className="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg px-2 py-1 w-full h-full flex items-center justify-center text-xs font-bold break-all leading-tight border border-indigo-100 dark:border-indigo-800 shadow-sm">{subject}</div>
                                         ) : (
-                                            isEditing && <div className="text-indigo-100 text-lg opacity-0 hover:opacity-100 transition-opacity">+</div>
+                                            isEditing && <div className="text-indigo-100 dark:text-indigo-800 text-lg opacity-0 hover:opacity-100 transition-opacity">+</div>
                                         )}
                                     </div>
                                 );
@@ -1250,33 +1366,33 @@ export default function StudyHubApp() {
               </div>
               
               <div className="mt-4 flex justify-end">
-                  <button onClick={() => setIsEditing(!isEditing)} className={`px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 ${isEditing ? 'bg-black text-white hover:bg-gray-800' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <button onClick={() => setIsEditing(!isEditing)} className={`px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 ${isEditing ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
                       {isEditing ? <> <Check size={16} /> {t('finish_edit')} </> : <> <Edit2 size={16} /> {t('edit_timetable')} </>}
                   </button>
               </div>
 
               {editModal.isOpen && (
                   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-                      <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl">
-                          <h3 className="font-bold text-lg mb-4 text-gray-800">{editModal.type === 'time' ? t('edit_modal_title_time') : t('edit_modal_title_course')}</h3>
+                      <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700">
+                          <h3 className="font-bold text-lg mb-4 text-gray-800 dark:text-gray-100">{editModal.type === 'time' ? t('edit_modal_title_time') : t('edit_modal_title_course')}</h3>
                           {editModal.type === 'time' ? (
                               <div className="flex items-center gap-2 mb-6">
-                                  <input type="time" className="border border-gray-300 rounded-lg p-2 text-sm w-full" value={timeEdit.start} onChange={e => setTimeEdit({...timeEdit, start: e.target.value})} />
-                                  <span>-</span>
-                                  <input type="time" className="border border-gray-300 rounded-lg p-2 text-sm w-full" value={timeEdit.end} onChange={e => setTimeEdit({...timeEdit, end: e.target.value})} />
+                                  <input type="time" className="border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={timeEdit.start} onChange={e => setTimeEdit({...timeEdit, start: e.target.value})} />
+                                  <span className="text-gray-500 dark:text-gray-400">-</span>
+                                  <input type="time" className="border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={timeEdit.end} onChange={e => setTimeEdit({...timeEdit, end: e.target.value})} />
                               </div>
                           ) : (
-                              <input autoFocus className="w-full border border-gray-300 rounded-xl p-3 mb-5 text-sm focus:border-black outline-none" value={editModal.value} onChange={e => setEditModal({...editModal, value: e.target.value})} placeholder={t('course_name_placeholder')} />
+                              <input autoFocus className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 mb-5 text-sm focus:border-black dark:focus:border-gray-500 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={editModal.value} onChange={e => setEditModal({...editModal, value: e.target.value})} placeholder={t('course_name_placeholder')} />
                           )}
                           <div className="flex gap-3">
                               {/* 只有在編輯課程且該格子已經有課程時，才顯示刪除按鈕 */}
                               {editModal.type === 'subject' && timetable[editModal.key] && (
-                                <button onClick={deleteSubject} className="flex-1 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-1">
+                                <button onClick={deleteSubject} className="flex-1 py-2.5 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-bold hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-1">
                                     <Trash2 size={16} /> {t('delete')}
                                 </button>
                               )}
-                              <button onClick={() => setEditModal({...editModal, isOpen: false})} className="flex-1 py-2.5 bg-gray-100 rounded-xl text-sm font-bold text-gray-600">{t('cancel')}</button>
-                              <button onClick={saveEdit} className="flex-1 py-2.5 bg-black text-white rounded-xl text-sm font-bold">{t('confirm')}</button>
+                              <button onClick={() => setEditModal({...editModal, isOpen: false})} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">{t('cancel')}</button>
+                              <button onClick={saveEdit} className="flex-1 py-2.5 bg-black dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">{t('confirm')}</button>
                           </div>
                       </div>
                   </div>
@@ -1376,22 +1492,22 @@ export default function StudyHubApp() {
 
       return (
           <div className="h-full flex flex-col md:flex-row gap-8">
-              <div className="flex-1 flex flex-col items-center justify-center space-y-8 bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-                  <div className="flex bg-gray-100 p-1.5 rounded-full">
-                      <button onClick={() => switchMode('work')} className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${mode === 'work' ? 'bg-white shadow text-red-500' : 'text-gray-500'}`}>{t('focus_mode')}</button>
-                      <button onClick={() => switchMode('break')} className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${mode === 'break' ? 'bg-white shadow text-green-500' : 'text-gray-500'}`}>{t('break_mode')}</button>
+              <div className="flex-1 flex flex-col items-center justify-center space-y-8 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-full">
+                      <button onClick={() => switchMode('work')} className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${mode === 'work' ? 'bg-white dark:bg-gray-600 shadow text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-300'}`}>{t('focus_mode')}</button>
+                      <button onClick={() => switchMode('break')} className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${mode === 'break' ? 'bg-white dark:bg-gray-600 shadow text-green-500 dark:text-green-400' : 'text-gray-500 dark:text-gray-300'}`}>{t('break_mode')}</button>
                   </div>
 
                   {mode === 'work' && (
                       <div className="w-full max-w-xs">
                           {isCreatingSubject ? (
                               <div className="flex gap-2 items-center">
-                                  <input autoFocus placeholder={t('input_subject')} className="w-full border-b-2 border-indigo-500 outline-none text-center pb-2 bg-transparent text-lg" value={customSubject} onChange={(e) => setCustomSubject(e.target.value)} />
-                                  <button onClick={handleConfirmSubject} className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full"><Check size={20}/></button>
-                                  <button onClick={() => setIsCreatingSubject(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 p-2 rounded-full"><X size={20}/></button>
+                                  <input autoFocus placeholder={t('input_subject')} className="w-full border-b-2 border-indigo-500 dark:border-indigo-400 outline-none text-center pb-2 bg-transparent text-lg text-gray-800 dark:text-gray-100" value={customSubject} onChange={(e) => setCustomSubject(e.target.value)} />
+                                  <button onClick={handleConfirmSubject} className="text-green-500 hover:text-green-600 bg-green-50 dark:bg-green-900/30 p-2 rounded-full"><Check size={20}/></button>
+                                  <button onClick={() => setIsCreatingSubject(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 dark:bg-gray-700 p-2 rounded-full"><X size={20}/></button>
                               </div>
                           ) : (
-                              <select className="bg-gray-50 border border-gray-200 text-gray-700 text-lg rounded-xl p-3 w-full outline-none focus:border-black text-center cursor-pointer" value={targetSubject} onChange={handleSubjectChange}>
+                              <select className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-lg rounded-xl p-3 w-full outline-none focus:border-black dark:focus:border-gray-400 text-center cursor-pointer" value={targetSubject} onChange={handleSubjectChange}>
                                   <option value="">{t('select_subject')}</option>
                                   {pomodoroSubjects.map(s => <option key={s} value={s}>{s}</option>)}
                                   <option value="NEW_CUSTOM">{t('new_custom_subject')}</option>
@@ -1400,25 +1516,25 @@ export default function StudyHubApp() {
                       </div>
                   )}
 
-                  <div className={`w-72 h-72 rounded-full border-[12px] flex items-center justify-center shadow-xl transition-all duration-500 ${mode === 'work' ? 'border-red-50 bg-white' : 'border-green-50 bg-white'}`}>
-                      <span className={`text-7xl font-mono font-bold tracking-tighter ${mode === 'work' ? 'text-red-500' : 'text-green-500'}`}>{formatTime(timeLeft)}</span>
+                  <div className={`w-72 h-72 rounded-full border-[12px] flex items-center justify-center shadow-xl transition-all duration-500 ${mode === 'work' ? 'border-red-50 dark:border-red-900/20 bg-white dark:bg-gray-800' : 'border-green-50 dark:border-green-900/20 bg-white dark:bg-gray-800'}`}>
+                      <span className={`text-7xl font-mono font-bold tracking-tighter ${mode === 'work' ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`}>{formatTime(timeLeft)}</span>
                   </div>
 
                   <div className="flex gap-6">
-                      <button onClick={toggleTimer} className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center hover:scale-105 transition-transform shadow-xl hover:shadow-2xl">{isActive ? <span className="text-3xl">⏸</span> : <span className="text-3xl ml-1">▶</span>}</button>
-                      <button onClick={resetTimer} className="w-20 h-20 rounded-full bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50 shadow-md hover:shadow-lg transition-all"><RotateCw size={28} /></button>
+                      <button onClick={toggleTimer} className="w-20 h-20 rounded-full bg-black dark:bg-gray-100 text-white dark:text-gray-900 flex items-center justify-center hover:scale-105 transition-transform shadow-xl hover:shadow-2xl">{isActive ? <span className="text-3xl">⏸</span> : <span className="text-3xl ml-1">▶</span>}</button>
+                      <button onClick={resetTimer} className="w-20 h-20 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 shadow-md hover:shadow-lg transition-all"><RotateCw size={28} /></button>
                   </div>
               </div>
 
-              <div className="w-full md:w-80 bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex flex-col">
+              <div className="w-full md:w-80 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
                   <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-bold text-gray-800 flex items-center gap-2"><BarChart2 size={20} className="text-blue-500"/> {t('weekly_stats')}</h3>
-                      <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded">{t('unit_hours')}</span>
+                      <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2"><BarChart2 size={20} className="text-blue-500"/> {t('weekly_stats')}</h3>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-mono bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">{t('unit_hours')}</span>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                     {subjectStats.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-300 text-sm italic border-2 border-dashed border-gray-100 rounded-xl min-h-[200px]">
+                        <div className="h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600 text-sm italic border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-xl min-h-[200px]">
                             <Clock size={40} className="mb-2 opacity-20"/>
                             {t('no_study_records')}
                         </div>
@@ -1427,10 +1543,10 @@ export default function StudyHubApp() {
                             {subjectStats.map((stat, i) => (
                                 <div key={stat.subject} className="flex flex-col gap-1">
                                     <div className="flex justify-between items-end">
-                                        <span className="text-sm font-bold text-gray-700">{stat.subject}</span>
-                                        <span className="text-xs text-gray-500 font-mono font-bold">{stat.hours}hr</span>
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{stat.subject}</span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono font-bold">{stat.hours}hr</span>
                                     </div>
-                                    <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="w-full h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                         <div className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full transition-all duration-1000" style={{ width: `${Math.max((parseFloat(stat.hours) / maxSubjectHours) * 100, 5)}%` }}></div>
                                     </div>
                                 </div>
@@ -1558,8 +1674,8 @@ export default function StudyHubApp() {
                   </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 flex flex-col overflow-hidden">
-                  <div className="grid grid-cols-12 bg-gray-50 text-xs font-bold text-gray-500 p-3 border-b border-gray-200 uppercase tracking-wide">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex-1 flex flex-col overflow-hidden">
+                  <div className="grid grid-cols-12 bg-gray-50 dark:bg-gray-900 text-xs font-bold text-gray-500 dark:text-gray-400 p-3 border-b border-gray-200 dark:border-gray-700 uppercase tracking-wide">
                       <div className="col-span-4 pl-2">{t('course_name')}</div>
                       <div className="col-span-2 text-center">{t('credit')}</div>
                       <div className="col-span-2 text-center">{t('score')}</div>
@@ -1569,86 +1685,86 @@ export default function StudyHubApp() {
                   
                   <div className="flex-1 overflow-y-auto">
                     {gpaCourses.map(course => (
-                        <div key={course.id} className="grid grid-cols-12 p-3 border-b border-gray-100 items-center gap-2 hover:bg-gray-50 transition-colors group">
+                        <div key={course.id} className="grid grid-cols-12 p-3 border-b border-gray-100 dark:border-gray-700 items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                             <div className="col-span-4 flex items-center gap-2">
-                                <input placeholder={t('course_name_placeholder')} className="w-full text-sm font-medium text-gray-800 border-none bg-transparent outline-none focus:ring-0 placeholder:text-gray-300" value={course.name} onChange={e => updateGpaRow(course.id, 'name', e.target.value)}/>
+                                <input placeholder={t('course_name_placeholder')} className="w-full text-sm font-medium text-gray-800 dark:text-gray-100 border-none bg-transparent outline-none focus:ring-0 placeholder:text-gray-300 dark:placeholder:text-gray-600" value={course.name} onChange={e => updateGpaRow(course.id, 'name', e.target.value)}/>
                             </div>
                             
-                            <input placeholder="-" type="number" className="col-span-2 text-center text-sm bg-gray-50 border border-gray-200 rounded-md py-1 focus:border-blue-500 outline-none" value={course.credit} onChange={e => updateGpaRow(course.id, 'credit', e.target.value)}/>
+                            <input placeholder="-" type="number" className="col-span-2 text-center text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md py-1 focus:border-blue-500 dark:focus:border-blue-400 outline-none text-gray-900 dark:text-gray-100" value={course.credit} onChange={e => updateGpaRow(course.id, 'credit', e.target.value)}/>
                             
-                            <input placeholder="-" type="number" className="col-span-2 text-center text-sm bg-gray-50 border border-gray-200 rounded-md py-1 font-bold text-blue-600 focus:border-blue-500 outline-none" value={course.score} onChange={e => updateGpaRow(course.id, 'score', e.target.value)} readOnly title="由細項計算"/>
+                            <input placeholder="-" type="number" className="col-span-2 text-center text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md py-1 font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 dark:focus:border-blue-400 outline-none" value={course.score} onChange={e => updateGpaRow(course.id, 'score', e.target.value)} readOnly title="由細項計算"/>
                             
-                            <div className="col-span-2 text-center text-sm font-mono text-gray-500">{scoreToPoint(course.score)}</div>
+                            <div className="col-span-2 text-center text-sm font-mono text-gray-500 dark:text-gray-400">{scoreToPoint(course.score)}</div>
                             
                             <div className="col-span-2 flex justify-center gap-1">
                                 <button 
                                     onClick={() => openCalculator(course)}
-                                    className="text-gray-400 hover:text-blue-600 p-1.5 hover:bg-blue-50 rounded-md transition-all"
+                                    className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-all"
                                     title={t('calc_semester_score')}
                                 >
                                     <PieChart size={16} />
                                 </button>
-                                <button onClick={() => removeGpaRow(course.id)} className="text-gray-300 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
+                                <button onClick={() => removeGpaRow(course.id)} className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-all opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
                             </div>
                         </div>
                     ))}
                   </div>
                   
-                  <div className="p-4 border-t border-gray-200 bg-gray-50/50">
-                    <button onClick={() => setIsAdding(true)} className="w-full py-3 text-center text-sm text-white font-bold bg-black rounded-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-sm"><Plus size={18} /> {t('add_course')}</button>
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                    <button onClick={() => setIsAdding(true)} className="w-full py-3 text-center text-sm text-white font-bold bg-black dark:bg-gray-100 dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all flex items-center justify-center gap-2 shadow-sm"><Plus size={18} /> {t('add_course')}</button>
                   </div>
               </div>
 
               {isAdding && (
                   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-                      <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl">
-                          <div className="flex justify-between items-center mb-6"><h3 className="font-bold text-lg text-gray-800">{t('add_course')}</h3><button onClick={() => setIsAdding(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button></div>
+                      <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700">
+                          <div className="flex justify-between items-center mb-6"><h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{t('add_course')}</h3><button onClick={() => setIsAdding(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><X size={20} /></button></div>
                           <div className="flex flex-col gap-4 mb-6">
                               <div>
-                                  <label className="text-xs font-bold text-gray-500 mb-1 block">{t('course_name')}</label>
-                                  <input className="w-full border border-gray-300 rounded-xl p-3 text-sm outline-none focus:border-black transition-colors" placeholder={t('course_name')} value={newCourse.name} onChange={e => setNewCourse({...newCourse, name: e.target.value})}/>
+                                  <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">{t('course_name')}</label>
+                                  <input className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-black dark:focus:border-gray-500 transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder={t('course_name')} value={newCourse.name} onChange={e => setNewCourse({...newCourse, name: e.target.value})}/>
                               </div>
                               <div className="flex gap-4">
                                   <div className="flex-1">
-                                      <label className="text-xs font-bold text-gray-500 mb-1 block">{t('credit')}</label>
-                                      <input className="w-full border border-gray-300 rounded-xl p-3 text-sm outline-none focus:border-black text-center" placeholder="3" type="number" value={newCourse.credit} onChange={e => setNewCourse({...newCourse, credit: e.target.value})}/>
+                                      <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">{t('credit')}</label>
+                                      <input className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-black dark:focus:border-gray-500 text-center bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="3" type="number" value={newCourse.credit} onChange={e => setNewCourse({...newCourse, credit: e.target.value})}/>
                                   </div>
                               </div>
                               <div>
-                                  <label className="text-xs font-bold text-gray-500 mb-1 block">{t('grade_note_optional')}</label>
-                                  <input className="w-full border border-gray-300 rounded-xl p-3 text-sm outline-none focus:border-black" placeholder={t('grade_note_placeholder')} value={newCourse.note} onChange={e => setNewCourse({...newCourse, note: e.target.value})}/>
+                                  <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">{t('grade_note_optional')}</label>
+                                  <input className="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-black dark:focus:border-gray-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder={t('grade_note_placeholder')} value={newCourse.note} onChange={e => setNewCourse({...newCourse, note: e.target.value})}/>
                               </div>
                           </div>
-                          <button onClick={addNewCourse} className="w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors">{t('confirm')}</button>
+                          <button onClick={addNewCourse} className="w-full bg-black dark:bg-gray-100 text-white dark:text-gray-900 py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">{t('confirm')}</button>
                       </div>
                   </div>
               )}
 
               {calcModal.isOpen && (
                   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-                      <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col h-[600px]">
-                          <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
+                      <div className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col h-[600px] border border-gray-200 dark:border-gray-700">
+                          <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
                               <div>
-                                  <h3 className="font-bold text-lg text-gray-800">{calcModal.courseName}</h3>
-                                  <span className="text-xs text-gray-500">{t('score_calculator')}</span>
+                                  <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{calcModal.courseName}</h3>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">{t('score_calculator')}</span>
                               </div>
-                              <button onClick={closeCalculator} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                              <button onClick={closeCalculator} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><X size={20} /></button>
                           </div>
                           
                           <div className="flex-1 overflow-y-auto mb-4 pr-1">
                               <div className="space-y-3">
                                   {currentCriteria.map((item, idx) => (
-                                      <div key={item.id} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                      <div key={item.id} className="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                                           <div className="flex gap-2">
                                               <input 
-                                                  className="flex-1 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500" 
+                                                  className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
                                                   placeholder={t('item_placeholder')}
                                                   value={item.name}
                                                   onChange={(e) => updateCriteriaItem(item.id, 'name', e.target.value)}
                                               />
                                               <input 
                                                   type="date"
-                                                  className="w-32 border border-gray-200 rounded-lg p-2 text-xs outline-none focus:border-blue-500 text-gray-600"
+                                                  className="w-32 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
                                                   value={item.date || getLocalDateString(new Date())}
                                                   onChange={(e) => updateCriteriaItem(item.id, 'date', e.target.value)}
                                               />
@@ -1656,7 +1772,7 @@ export default function StudyHubApp() {
                                           <div className="flex gap-2 items-center">
                                               <div className="relative w-24">
                                                   <input 
-                                                      className="w-full border border-gray-200 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 pr-5" 
+                                                      className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 dark:focus:border-blue-400 pr-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
                                                       placeholder={t('weight_placeholder')}
                                                       type="number"
                                                       value={item.weight}
@@ -1666,7 +1782,7 @@ export default function StudyHubApp() {
                                               </div>
                                               <span className="text-gray-400 text-xs">x</span>
                                               <input 
-                                                  className="w-20 border border-gray-200 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 font-bold text-blue-600" 
+                                                  className="w-20 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 dark:focus:border-blue-400 font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700" 
                                                   placeholder={t('score_placeholder')}
                                                   type="number"
                                                   value={item.score}
@@ -1674,26 +1790,26 @@ export default function StudyHubApp() {
                                               />
                                               <span className="text-gray-400 text-xs">= {((parseFloat(item.score)||0) * (parseFloat(item.weight)||0)/100).toFixed(1)}</span>
                                               <div className="flex-1"></div>
-                                              <button onClick={() => removeCriteriaItem(item.id)} className="text-gray-300 hover:text-red-500 bg-white p-1.5 rounded-lg border border-gray-200 hover:border-red-200"><Trash2 size={16}/></button>
+                                              <button onClick={() => removeCriteriaItem(item.id)} className="text-gray-300 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 bg-white dark:bg-gray-700 p-1.5 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-200 dark:hover:border-red-900"><Trash2 size={16}/></button>
                                           </div>
                                       </div>
                                   ))}
-                                  <button onClick={addCriteriaItem} className="w-full border border-dashed border-gray-300 py-2.5 rounded-lg text-xs text-gray-500 hover:border-gray-400 hover:bg-gray-50 transition-all">{t('add_criteria_item')}</button>
+                                  <button onClick={addCriteriaItem} className="w-full border border-dashed border-gray-300 dark:border-gray-600 py-2.5 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">{t('add_criteria_item')}</button>
                               </div>
                           </div>
 
-                          <div className="border-t border-gray-100 pt-4 mt-auto">
+                          <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-auto">
                               <div className="flex justify-between items-center mb-4">
-                                  <div className="text-xs text-gray-500">
-                                      {t('total_weight')}: <span className={currentTotalWeight !== 100 ? 'text-red-500 font-bold' : 'text-green-600 font-bold'}>{currentTotalWeight}%</span>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                      {t('total_weight')}: <span className={currentTotalWeight !== 100 ? 'text-red-500 dark:text-red-400 font-bold' : 'text-green-600 dark:text-green-400 font-bold'}>{currentTotalWeight}%</span>
                                       {currentTotalWeight !== 100 && ` ${t('not_100')}`}
                                   </div>
                                   <div className="text-right">
-                                      <span className="text-xs text-gray-500 block">{t('estimated_score')}</span>
-                                      <span className="text-3xl font-black text-blue-600">{currentTotalScore}</span>
+                                      <span className="text-xs text-gray-500 dark:text-gray-400 block">{t('estimated_score')}</span>
+                                      <span className="text-3xl font-black text-blue-600 dark:text-blue-400">{currentTotalScore}</span>
                                   </div>
                               </div>
-                              <button onClick={saveCriteria} className="w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors">{t('save_and_apply')}</button>
+                              <button onClick={saveCriteria} className="w-full bg-black dark:bg-gray-100 text-white dark:text-gray-900 py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">{t('save_and_apply')}</button>
                           </div>
                       </div>
                   </div>
@@ -1857,14 +1973,14 @@ export default function StudyHubApp() {
     return (
       <div className="h-full flex flex-col">
         <div className="flex justify-between items-center mb-6">
-            <div className="flex bg-gray-100 p-1 rounded-xl overflow-x-auto no-scrollbar">
+            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl overflow-x-auto no-scrollbar">
                 {['weekly:all_records', 'subjects:subject_categories', 'history:gpa_history'].map(m => {
                     const [mode, label] = m.split(':');
                     return ( 
                         <button 
                             key={mode} 
                             onClick={() => { setViewMode(mode); setSelectedSubjectId(null); setSelectedHistorySemester(null); }} 
-                            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${viewMode === mode || (mode==='subjects' && selectedSubjectId) || (mode==='history' && selectedHistorySemester) ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${viewMode === mode || (mode==='subjects' && selectedSubjectId) || (mode==='history' && selectedHistorySemester) ? 'bg-white dark:bg-gray-700 shadow text-black dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                         >
                             {t(label)}
                         </button> 
@@ -1877,22 +1993,22 @@ export default function StudyHubApp() {
             {viewMode === 'weekly' && (
                 <div className="space-y-4">
                     {weeklyRecords.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-48 text-gray-300 text-sm">
+                        <div className="flex flex-col items-center justify-center h-48 text-gray-300 dark:text-gray-600 text-sm">
                             <Calendar size={48} className="mb-2 opacity-20" />
                             {t('no_criteria_records')}
                         </div>
                     ) : (
                         weeklyRecords.map((item, idx) => (
-                            <div key={`${item.id}-${idx}`} className="bg-white border-l-4 border-blue-500 shadow-sm rounded-r-xl p-4 flex justify-between items-center">
+                            <div key={`${item.id}-${idx}`} className="bg-white dark:bg-gray-800 border-l-4 border-blue-500 shadow-sm rounded-r-xl p-4 flex justify-between items-center">
                                 <div>
-                                    <h4 className="font-bold text-gray-800">{item.courseName}</h4>
-                                    <div className="flex gap-2 text-xs text-gray-500 mt-1">
-                                        <span className="bg-gray-100 px-1.5 rounded">{item.date}</span>
+                                    <h4 className="font-bold text-gray-800 dark:text-gray-100">{item.courseName}</h4>
+                                    <div className="flex gap-2 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <span className="bg-gray-100 dark:bg-gray-700 px-1.5 rounded">{item.date}</span>
                                         <span>{item.name}</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-2xl font-black text-gray-800">{item.score}</div>
+                                    <div className="text-2xl font-black text-gray-800 dark:text-gray-100">{item.score}</div>
                                     <div className="text-[10px] text-gray-400">權重: {item.weight}%</div>
                                 </div>
                             </div>
@@ -1906,10 +2022,10 @@ export default function StudyHubApp() {
                     {gpaCourses.map(course => {
                         const count = (courseCriteria[course.id] || courseCriteria[course.name] || []).length;
                         return (
-                            <div key={course.id} onClick={() => setSelectedSubjectId(course.id)} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:border-blue-400 hover:shadow-md transition-all">
-                                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4"><BookOpen size={24} /></div>
-                                <h4 className="font-bold text-gray-800 text-lg mb-1 line-clamp-1">{course.name}</h4>
-                                <span className="text-xs font-bold text-gray-400">{t('records_count', {count})}</span>
+                            <div key={course.id} onClick={() => setSelectedSubjectId(course.id)} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all">
+                                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center mb-4"><BookOpen size={24} /></div>
+                                <h4 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1 line-clamp-1">{course.name}</h4>
+                                <span className="text-xs font-bold text-gray-400 dark:text-gray-500">{t('records_count', {count})}</span>
                             </div>
                         );
                     })}
@@ -1918,24 +2034,24 @@ export default function StudyHubApp() {
 
             {selectedSubjectId && (
                 <div className="space-y-4 max-w-2xl mx-auto">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setSelectedSubjectId(null)} className="bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition-colors"><ArrowLeft size={20} /></button>
-                            <h2 className="text-2xl font-bold text-gray-800">
+                            <button onClick={() => setSelectedSubjectId(null)} className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-200"><ArrowLeft size={20} /></button>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                                 {gpaCourses.find(c => c.id === selectedSubjectId)?.name}
                             </h2>
                         </div>
                     </div>
 
                     {(courseCriteria[selectedSubjectId] || []).sort((a,b) => new Date(b.date) - new Date(a.date)).map(item => (
-                        <div key={item.id} className="bg-white border border-gray-100 shadow-sm rounded-xl p-4 flex justify-between items-center">
+                        <div key={item.id} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm rounded-xl p-4 flex justify-between items-center">
                             <div>
                                 <span className="text-xs text-gray-400 font-mono block mb-1">{item.date}</span>
-                                <span className="text-base font-bold text-gray-800">{item.name}</span>
+                                <span className="text-base font-bold text-gray-800 dark:text-gray-100">{item.name}</span>
                             </div>
                             <div className="flex items-center gap-4">
-                                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{item.weight}%</span>
-                                <span className="text-2xl font-black text-gray-800">{item.score}</span>
+                                <span className="text-xs text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">{item.weight}%</span>
+                                <span className="text-2xl font-black text-gray-800 dark:text-gray-100">{item.score}</span>
                             </div>
                         </div>
                     ))}
@@ -1945,20 +2061,20 @@ export default function StudyHubApp() {
             {viewMode === 'history' && !selectedHistorySemester && (
                 <div className="space-y-4">
                     {archivedSemesters.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-48 text-gray-300 text-sm">
+                        <div className="flex flex-col items-center justify-center h-48 text-gray-300 dark:text-gray-600 text-sm">
                             <History size={48} className="mb-2 opacity-20" />
                             {t('no_archived_data')}
                         </div>
                     ) : (
                         archivedSemesters.map(semester => (
-                            <div key={semester.id} onClick={() => setSelectedHistorySemester(semester.id)} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all flex justify-between items-center">
+                            <div key={semester.id} onClick={() => setSelectedHistorySemester(semester.id)} className="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition-all flex justify-between items-center">
                                 <div>
-                                    <h4 className="font-bold text-gray-800 text-lg mb-1">{semester.name}</h4>
+                                    <h4 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1">{semester.name}</h4>
                                     <span className="text-xs text-gray-400">歸檔日: {new Date(semester.archivedDate).toLocaleDateString()}</span>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-xs font-bold text-indigo-500 block mb-1">GPA</span>
-                                    <span className="text-2xl font-black text-gray-800">
+                                    <span className="text-xs font-bold text-indigo-500 dark:text-indigo-400 block mb-1">GPA</span>
+                                    <span className="text-2xl font-black text-gray-800 dark:text-gray-100">
                                         {(semester.courses.reduce((acc, curr) => {
                                             const s = parseFloat(curr.score);
                                             const c = parseFloat(curr.credit);
@@ -1974,10 +2090,10 @@ export default function StudyHubApp() {
 
             {selectedHistorySemester && (
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setSelectedHistorySemester(null)} className="bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition-colors"><ArrowLeft size={20} /></button>
-                            <h2 className="text-xl font-bold text-gray-800">
+                            <button onClick={() => setSelectedHistorySemester(null)} className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-200"><ArrowLeft size={20} /></button>
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                                 {archivedSemesters.find(s => s.id === selectedHistorySemester)?.name}
                             </h2>
                         </div>
@@ -1990,27 +2106,27 @@ export default function StudyHubApp() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-12 bg-gray-50 text-xs font-bold text-gray-500 p-3 border-b border-gray-200 uppercase tracking-wide">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div className="grid grid-cols-12 bg-gray-50 dark:bg-gray-900 text-xs font-bold text-gray-500 dark:text-gray-400 p-3 border-b border-gray-200 dark:border-gray-700 uppercase tracking-wide">
                             <div className="col-span-6 pl-2">{t('course_name')}</div>
                             <div className="col-span-2 text-center">{t('credit')}</div>
                             <div className="col-span-2 text-center">{t('score')}</div>
                             <div className="col-span-2 text-center">{t('action')}</div>
                         </div>
                         {archivedSemesters.find(s => s.id === selectedHistorySemester)?.courses.map((course, idx) => (
-                            <div key={course.id || idx} className="grid grid-cols-12 p-3 border-b border-gray-100 items-center gap-2 hover:bg-gray-50 transition-colors">
-                                <div className="col-span-6 font-medium text-sm text-gray-800 pl-2">
+                            <div key={course.id || idx} className="grid grid-cols-12 p-3 border-b border-gray-100 dark:border-gray-700 items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                <div className="col-span-6 font-medium text-sm text-gray-800 dark:text-gray-100 pl-2">
                                     {course.name}
                                 </div>
                                 <input 
                                     type="number" 
-                                    className="col-span-2 text-center text-sm bg-gray-50 border border-gray-200 rounded-md py-1 focus:border-indigo-500 outline-none"
+                                    className="col-span-2 text-center text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md py-1 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none text-gray-900 dark:text-gray-100"
                                     value={course.credit}
                                     onChange={(e) => updateArchivedCourse(course.id, 'credit', e.target.value)}
                                 />
                                 <input 
                                     type="number" 
-                                    className="col-span-2 text-center text-sm bg-gray-50 border border-gray-200 rounded-md py-1 font-bold text-indigo-600 focus:border-indigo-500 outline-none"
+                                    className="col-span-2 text-center text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md py-1 font-bold text-indigo-600 dark:text-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none"
                                     value={course.score}
                                     onChange={(e) => updateArchivedCourse(course.id, 'score', e.target.value)}
                                     readOnly // 設為唯讀，強制透過細項修改
@@ -2019,7 +2135,7 @@ export default function StudyHubApp() {
                                 <div className="col-span-2 flex justify-center">
                                     <button 
                                         onClick={() => openHistoryCalculator(course)}
-                                        className="text-gray-400 hover:text-indigo-600 p-1.5 hover:bg-indigo-50 rounded-md transition-all"
+                                        className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-1.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-all"
                                         title={t('calc_semester_score')}
                                     >
                                         <PieChart size={16} />
@@ -2034,29 +2150,29 @@ export default function StudyHubApp() {
             {/* 歷史紀錄成績計算 Modal */}
             {historyCalcModal.isOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-                    <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col h-[600px]">
-                        <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
+                    <div className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col h-[600px] border border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
                             <div>
-                                <h3 className="font-bold text-lg text-gray-800">{historyCalcModal.courseName}</h3>
-                                <span className="text-xs text-gray-500">{t('score_calculator')} (歷史紀錄)</span>
+                                <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{historyCalcModal.courseName}</h3>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{t('score_calculator')} (歷史紀錄)</span>
                             </div>
-                            <button onClick={closeHistoryCalculator} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                            <button onClick={closeHistoryCalculator} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><X size={20} /></button>
                         </div>
                         
                         <div className="flex-1 overflow-y-auto mb-4 pr-1">
                             <div className="space-y-3">
                                 {tempHistoryCriteria.map((item, idx) => (
-                                    <div key={item.id} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div key={item.id} className="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                                         <div className="flex gap-2">
                                             <input 
-                                                className="flex-1 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500" 
+                                                className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
                                                 placeholder={t('item_placeholder')}
                                                 value={item.name}
                                                 onChange={(e) => updateHistoryCriteriaItem(item.id, 'name', e.target.value)}
                                             />
                                             <input 
                                                 type="date"
-                                                className="w-32 border border-gray-200 rounded-lg p-2 text-xs outline-none focus:border-blue-500 text-gray-600"
+                                                className="w-32 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
                                                 value={item.date || getLocalDateString(new Date())}
                                                 onChange={(e) => updateHistoryCriteriaItem(item.id, 'date', e.target.value)}
                                             />
@@ -2064,7 +2180,7 @@ export default function StudyHubApp() {
                                         <div className="flex gap-2 items-center">
                                             <div className="relative w-24">
                                                 <input 
-                                                    className="w-full border border-gray-200 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 pr-5" 
+                                                    className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 dark:focus:border-blue-400 pr-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
                                                     placeholder={t('weight_placeholder')}
                                                     type="number"
                                                     value={item.weight}
@@ -2074,7 +2190,7 @@ export default function StudyHubApp() {
                                             </div>
                                             <span className="text-gray-400 text-xs">x</span>
                                             <input 
-                                                className="w-20 border border-gray-200 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 font-bold text-blue-600" 
+                                                className="w-20 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm text-center outline-none focus:border-blue-500 dark:focus:border-blue-400 font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700" 
                                                 placeholder={t('score_placeholder')}
                                                 type="number"
                                                 value={item.score}
@@ -2082,26 +2198,26 @@ export default function StudyHubApp() {
                                             />
                                             <span className="text-gray-400 text-xs">= {((parseFloat(item.score)||0) * (parseFloat(item.weight)||0)/100).toFixed(1)}</span>
                                             <div className="flex-1"></div>
-                                            <button onClick={() => removeHistoryCriteriaItem(item.id)} className="text-gray-300 hover:text-red-500 bg-white p-1.5 rounded-lg border border-gray-200 hover:border-red-200"><Trash2 size={16}/></button>
+                                            <button onClick={() => removeHistoryCriteriaItem(item.id)} className="text-gray-300 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 bg-white dark:bg-gray-700 p-1.5 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-200 dark:hover:border-red-900"><Trash2 size={16}/></button>
                                         </div>
                                     </div>
                                 ))}
-                                <button onClick={addHistoryCriteriaItem} className="w-full border border-dashed border-gray-300 py-2.5 rounded-lg text-xs text-gray-500 hover:border-gray-400 hover:bg-gray-50 transition-all">{t('add_criteria_item')}</button>
+                                <button onClick={addHistoryCriteriaItem} className="w-full border border-dashed border-gray-300 dark:border-gray-600 py-2.5 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">{t('add_criteria_item')}</button>
                             </div>
                         </div>
 
-                        <div className="border-t border-gray-100 pt-4 mt-auto">
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-auto">
                             <div className="flex justify-between items-center mb-4">
-                                <div className="text-xs text-gray-500">
-                                    {t('total_weight')}: <span className={tempHistoryTotalWeight !== 100 ? 'text-red-500 font-bold' : 'text-green-600 font-bold'}>{tempHistoryTotalWeight}%</span>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {t('total_weight')}: <span className={tempHistoryTotalWeight !== 100 ? 'text-red-500 dark:text-red-400 font-bold' : 'text-green-600 dark:text-green-400 font-bold'}>{tempHistoryTotalWeight}%</span>
                                     {tempHistoryTotalWeight !== 100 && ` ${t('not_100')}`}
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-xs text-gray-500 block">{t('estimated_score')}</span>
-                                    <span className="text-3xl font-black text-blue-600">{tempHistoryTotalScore}</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 block">{t('estimated_score')}</span>
+                                    <span className="text-3xl font-black text-blue-600 dark:text-blue-400">{tempHistoryTotalScore}</span>
                                 </div>
                             </div>
-                            <button onClick={saveHistoryCriteria} className="w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors">{t('save_and_apply')}</button>
+                            <button onClick={saveHistoryCriteria} className="w-full bg-black dark:bg-gray-100 text-white dark:text-gray-900 py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">{t('save_and_apply')}</button>
                         </div>
                     </div>
                 </div>
@@ -2113,8 +2229,8 @@ export default function StudyHubApp() {
 
   const DashboardView = ({ tasks, currentDate, setCurrentDate }) => (
       <div className="h-full flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-80 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm h-fit">
-              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2"><Calendar size={20} className="text-red-500"/> {currentDate.getMonth()+1}月</h2>
+          <div className="w-full md:w-80 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm h-fit">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2"><Calendar size={20} className="text-red-500 dark:text-red-400"/> {currentDate.getMonth()+1}月</h2>
               <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-2">
                 {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(d => <div key={d}>{t(d)}</div>)}
               </div>
@@ -2126,7 +2242,7 @@ export default function StudyHubApp() {
                       const isSelected = day === currentDate.getDate();
                       const dayTasks = tasks.filter(t => new Date(t.date).toDateString() === dateObj.toDateString());
                       return (
-                          <div key={i} onClick={() => setCurrentDate(dateObj)} className={`aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer relative transition-all ${isSelected ? 'bg-black text-white shadow-md' : 'bg-white hover:bg-gray-50 text-gray-700'}`}>
+                          <div key={i} onClick={() => setCurrentDate(dateObj)} className={`aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer relative transition-all ${isSelected ? 'bg-black dark:bg-gray-100 text-white dark:text-gray-900 shadow-md' : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
                               <span className="text-xs font-bold z-10">{day}</span>
                               <div className="flex gap-0.5 mt-1 h-1">{dayTasks.slice(0, 3).map((t, idx) => (<div key={idx} className={`w-1 h-1 rounded-full ${CATEGORIES[t.category.toUpperCase()]?.color || 'bg-gray-400'}`}></div>))}</div>
                           </div>
@@ -2135,25 +2251,25 @@ export default function StudyHubApp() {
               </div>
           </div>
           
-          <div className="flex-1 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col">
-              <h3 className="text-lg font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4">{currentDate.getMonth()+1}/{currentDate.getDate()} 行程概覽</h3>
+          <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">{currentDate.getMonth()+1}/{currentDate.getDate()} 行程概覽</h3>
               <div className="flex-1 overflow-y-auto space-y-3 pr-2">
                 {tasks.filter(t => new Date(t.date).toDateString() === currentDate.toDateString()).length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-300 text-sm italic">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3"><Sparkles size={24} className="opacity-20"/></div>
+                    <div className="h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-500 text-sm italic">
+                        <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3"><Sparkles size={24} className="opacity-20"/></div>
                         {t('no_tasks_today')}
                     </div>
                 ) : (
                     tasks.filter(t => new Date(t.date).toDateString() === currentDate.toDateString()).map(task => (
-                        <div key={task.id} className={`flex items-center p-4 bg-white rounded-xl shadow-sm border-l-4 ${CATEGORIES[task.category.toUpperCase()].border} border-t border-r border-b border-gray-100 hover:shadow-md transition-shadow`}>
+                        <div key={task.id} className={`flex items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${CATEGORIES[task.category.toUpperCase()].border} border-t border-r border-b border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow`}>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className={`text-[10px] px-2 py-0.5 rounded-full text-white font-bold ${CATEGORIES[task.category.toUpperCase()].color}`}>{t('categories.' + task.category)}</span>
-                                    <span className="font-bold text-gray-800">{task.subject}</span>
+                                    <span className="font-bold text-gray-800 dark:text-gray-100">{task.subject}</span>
                                 </div>
-                                <p className="text-sm text-gray-500 pl-1">{task.note}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 pl-1">{task.note}</p>
                             </div>
-                            {task.completed ? <div className="bg-green-50 text-green-600 p-1.5 rounded-full"><Check size={20} /></div> : <div className="w-5 h-5 rounded-full border-2 border-gray-200"></div>}
+                            {task.completed ? <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-1.5 rounded-full"><Check size={20} /></div> : <div className="w-5 h-5 rounded-full border-2 border-gray-200 dark:border-gray-600"></div>}
                         </div>
                     ))
                 )}
@@ -2164,6 +2280,7 @@ export default function StudyHubApp() {
 
   const PlannerView = ({ tasks, setTasks, weekDays }) => {
     const [newItem, setNewItem] = useState({ category: 'homework', subject: '', note: '' });
+    const fileInputRef = useRef(null);
     
     const toggleTask = (id) => { setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t)); };
     
@@ -2185,8 +2302,92 @@ export default function StudyHubApp() {
         }
     };
 
+    const handleIcsImport = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target.result;
+                const lines = text.split(/\r\n|\n/);
+                const newTasks = [];
+                let currentEvent = null;
+
+                lines.forEach((line) => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine === 'BEGIN:VEVENT') {
+                        currentEvent = {};
+                    } else if (trimmedLine === 'END:VEVENT') {
+                        if (currentEvent && currentEvent.date && currentEvent.subject) {
+                            newTasks.push({
+                                id: Date.now() + Math.random(),
+                                date: currentEvent.date,
+                                category: 'other', // 強制分類為其他
+                                subject: currentEvent.subject,
+                                note: currentEvent.note || '',
+                                completed: false
+                            });
+                        }
+                        currentEvent = null;
+                    } else if (currentEvent) {
+                        if (trimmedLine.startsWith('SUMMARY:')) {
+                            currentEvent.subject = trimmedLine.substring(8);
+                        } else if (trimmedLine.startsWith('DESCRIPTION:')) {
+                            currentEvent.note = trimmedLine.substring(12);
+                        } else if (trimmedLine.startsWith('DTSTART')) {
+                            // 處理 DTSTART:20231101T... 或 DTSTART;VALUE=DATE:20231101
+                            const parts = trimmedLine.split(':');
+                            if (parts.length >= 2) {
+                                const dateVal = parts[1];
+                                // 基本解析 YYYYMMDD
+                                if (dateVal.length >= 8) {
+                                    const y = dateVal.substring(0, 4);
+                                    const m = dateVal.substring(4, 6);
+                                    const d = dateVal.substring(6, 8);
+                                    currentEvent.date = `${y}-${m}-${d}`;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (newTasks.length > 0) {
+                    setTasks(prev => [...prev, ...newTasks]);
+                    alert(t('import_success', { count: newTasks.length }));
+                } else {
+                    alert(t('import_error'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert(t('import_error'));
+            }
+            // 重置 input 以便下次能選同一個檔案
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    };
+
     return (
       <div className="h-full flex flex-col">
+        {/* ICS 匯入工具列 */}
+        <div className="flex justify-end px-2 pb-2">
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept=".ics" 
+                className="hidden" 
+                onChange={handleIcsImport} 
+            />
+            <button 
+                onClick={() => fileInputRef.current.click()}
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-all"
+                title={t('ics_format_hint')}
+            >
+                <Upload size={14} /> {t('import_ics')}
+            </button>
+        </div>
+
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 h-full overflow-y-auto xl:overflow-hidden">
             {weekDays.map((day, index) => {
             const dateStr = getLocalDateString(day);
@@ -2195,22 +2396,22 @@ export default function StudyHubApp() {
             const weekDayKey = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][index];
             
             return (
-                <div key={dateStr} className={`flex flex-col rounded-xl border ${isToday ? 'border-blue-500 shadow-md ring-2 ring-blue-50' : 'border-gray-200 shadow-sm'} bg-white overflow-hidden h-fit xl:h-full transition-all`}>
-                    <div className={`px-3 py-2 border-b ${isToday ? 'bg-blue-500 text-white' : 'bg-gray-50 text-gray-700'} text-xs font-bold flex justify-between items-center`}>
+                <div key={dateStr} className={`flex flex-col rounded-xl border ${isToday ? 'border-blue-500 dark:border-blue-400 shadow-md ring-2 ring-blue-50 dark:ring-blue-900/20' : 'border-gray-200 dark:border-gray-700 shadow-sm'} bg-white dark:bg-gray-800 overflow-hidden h-fit xl:h-full transition-all`}>
+                    <div className={`px-3 py-2 border-b ${isToday ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300'} border-gray-100 dark:border-gray-700 text-xs font-bold flex justify-between items-center`}>
                         <span>{t(weekDayKey)}</span>
                         <span className={isToday ? 'text-blue-100' : 'text-gray-400'}>{day.getMonth()+1}/{day.getDate()}</span>
                     </div>
                     
-                    <div className="flex-1 overflow-y-auto p-2 space-y-1.5 bg-gray-50/30 min-h-[100px] xl:min-h-0 custom-scrollbar">
-                        {dayTasks.length === 0 && <div className="text-[10px] text-gray-300 text-center py-4 italic">{t('no_tasks')}</div>}
+                    <div className="flex-1 overflow-y-auto p-2 space-y-1.5 bg-gray-50/30 dark:bg-gray-900/30 min-h-[100px] xl:min-h-0 custom-scrollbar">
+                        {dayTasks.length === 0 && <div className="text-[10px] text-gray-300 dark:text-gray-600 text-center py-4 italic">{t('no_tasks')}</div>}
                         {dayTasks.map(task => (
-                            <div key={task.id} className={`group relative bg-white p-2 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all ${task.completed ? 'opacity-60 grayscale' : ''}`}>
+                            <div key={task.id} className={`group relative bg-white dark:bg-gray-700 p-2 rounded-lg border border-gray-100 dark:border-gray-600 shadow-sm hover:shadow-md transition-all ${task.completed ? 'opacity-60 grayscale' : ''}`}>
                                 <div className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${CATEGORIES[task.category.toUpperCase()].color}`}></div>
                                 <div className="flex items-start gap-2 pl-2">
-                                    <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} className="mt-0.5 w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"/>
+                                    <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} className="mt-0.5 w-3 h-3 rounded border-gray-300 dark:border-gray-500 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0 bg-white dark:bg-gray-600"/>
                                     <div className="flex-1 min-w-0">
-                                        <div className={`font-bold text-xs truncate ${task.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.subject}</div>
-                                        <div className="text-[10px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                                        <div className={`font-bold text-xs truncate ${task.completed ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-gray-100'}`}>{task.subject}</div>
+                                        <div className="text-[10px] text-gray-500 dark:text-gray-400 truncate flex items-center gap-1 mt-0.5">
                                             <span className={`px-1.5 py-0.5 rounded text-white font-bold text-[9px] ${CATEGORIES[task.category.toUpperCase()]?.color}`}>
                                                 {t('categories.' + task.category)}
                                             </span>
@@ -2223,7 +2424,7 @@ export default function StudyHubApp() {
                                         e.stopPropagation();
                                         handleDelete(task.id, task.subject);
                                     }}
-                                    className="absolute top-1 right-1 text-gray-300 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                                    className="absolute top-1 right-1 text-gray-300 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -2231,15 +2432,15 @@ export default function StudyHubApp() {
                         ))}
                     </div>
 
-                    <div className="p-2 bg-white border-t border-gray-100">
+                    <div className="p-2 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
                         <div className="flex flex-col gap-1.5">
                             <div className="flex gap-1.5">
-                                <select className="text-[10px] border border-gray-200 rounded p-1 bg-gray-50 outline-none flex-1 truncate" value={newItem.category} onChange={(e) => setNewItem({...newItem, category: e.target.value})}>{Object.values(CATEGORIES).map(c => <option key={c.id} value={c.id}>{t('categories.' + c.key)}</option>)}</select>
-                                <input placeholder={t('subject_placeholder')} className="text-[10px] border border-gray-200 p-1 rounded w-16 outline-none focus:border-blue-500" onChange={e=>setNewItem({...newItem, subject: e.target.value})} value={newItem.subject} />
+                                <select className="text-[10px] border border-gray-200 dark:border-gray-600 rounded p-1 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 outline-none flex-1 truncate" value={newItem.category} onChange={(e) => setNewItem({...newItem, category: e.target.value})}>{Object.values(CATEGORIES).map(c => <option key={c.id} value={c.id}>{t('categories.' + c.key)}</option>)}</select>
+                                <input placeholder={t('subject_placeholder')} className="text-[10px] border border-gray-200 dark:border-gray-600 p-1 rounded w-16 outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500" onChange={e=>setNewItem({...newItem, subject: e.target.value})} value={newItem.subject} />
                             </div>
                             <div className="flex gap-1.5">
-                                <input placeholder={t('note_placeholder')} className="text-[10px] border border-gray-200 p-1 rounded flex-1 outline-none focus:border-blue-500" onChange={e=>setNewItem({...newItem, note: e.target.value})} value={newItem.note} />
-                                <button onClick={()=>handleAdd(dateStr)} className="p-1 bg-black text-white rounded hover:bg-gray-800 transition-colors flex items-center justify-center w-6"><Plus size={12}/></button>
+                                <input placeholder={t('note_placeholder')} className="text-[10px] border border-gray-200 dark:border-gray-600 p-1 rounded flex-1 outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500" onChange={e=>setNewItem({...newItem, note: e.target.value})} value={newItem.note} />
+                                <button onClick={()=>handleAdd(dateStr)} className="p-1 bg-black dark:bg-gray-100 text-white dark:text-gray-900 rounded hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center justify-center w-6"><Plus size={12}/></button>
                             </div>
                         </div>
                     </div>
@@ -2252,15 +2453,15 @@ export default function StudyHubApp() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gray-50 font-sans overflow-hidden">
+    <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-950 font-sans overflow-hidden transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0">
         <TopBar />
         <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
           <div className="max-w-6xl mx-auto h-full flex flex-col">
              {!isDataLoaded ? (
-                <div className="flex-1 flex items-center justify-center text-gray-400 animate-pulse flex-col gap-2">
-                   <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
+                <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500 animate-pulse flex-col gap-2">
+                   <div className="w-8 h-8 border-4 border-gray-200 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin"></div>
                    <span className="text-sm font-bold">{t('loading')}</span>
                 </div>
              ) : (
